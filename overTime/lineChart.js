@@ -6,6 +6,7 @@ var LINECHART = (function(){
 	var sharpSmooth = new Array();
 	var circlesOnOff = new Array();
 	var pathOnOff = new Array();
+	var fahrCels;
 	var axisC;
 	var axisW;
 	var pathColor;
@@ -23,6 +24,7 @@ var LINECHART = (function(){
 	var pathOnOffDefault;
 	var sharpSmoothDefault;
 	var fillDefault;
+	var fahrCelsDefault;
 	var thisLocalHost;
 	var thisMsgTopic;
 	var mainChartDiv;
@@ -51,11 +53,10 @@ var LINECHART = (function(){
 	var divCirclesOnOff
 	var divSharpSmooth
 	var divFill
+	var divFahrCels
 	var divEstimatedValues
 	var divSelectAll
-	var divStart
-	var divStop
-	var divReset
+	var divCSV
 	var divLineButtons
 	var divSelectedOption
 	var divStatus
@@ -65,6 +66,7 @@ var LINECHART = (function(){
 	var data_type = new Array();
 	var y = new Array();
 	var x;
+	var CSVContents;
 	return {
 	createUserInterface: function(){}, //Declare Functions
 	domainSize: function(){},
@@ -86,11 +88,9 @@ var LINECHART = (function(){
 	yLabel: function(){},
 	yyTicksF: function(){},
 	fillFunction: function(){},
+	fahrCelsFunction: function(){},
 	newDomain: function(){},
 	lineSelected: function(){},
-	resetingEachPath: function(){},
-	Reset: function(){},
-	Stop: function(){},
 	Start: function(){},
 	changeLineSelected: function(optionLineSelect)
 	{
@@ -129,20 +129,19 @@ var LINECHART = (function(){
 		divRangeMin = optionRangeMin
 		divRangeMax = optionRangeMax
 	},
-	options5: function(optionCirclesOnOff, optionPathOnOff, optionSharpSmooth, optionFill, optionEstimatedValues, optionSelectAll)
+	options5: function(optionCirclesOnOff, optionPathOnOff, optionSharpSmooth, optionFill, optionFahrCels, optionEstimatedValues, optionSelectAll)
 	{
 		divPathOnOff = optionPathOnOff
 		divCirclesOnOff = optionCirclesOnOff
 		divSharpSmooth = optionSharpSmooth
 		divFill = optionFill
+		divFahrCels = optionFahrCels
 		divEstimatedValues = optionEstimatedValues
 		divSelectAll = optionSelectAll
 	},
-	options6: function(thisStart, thisStop, thisReset, thisLineButtons)
+	options6: function(thisCSV, thisLineButtons)
 	{
-		divStart = thisStart
-		divStop = thisStop
-		divReset = thisReset
+		divCSV = thisCSV
 		divLineButtons = thisLineButtons
 	},
 	options7: function(thisStatus, thisClickedStatus, thisSelectedOption)
@@ -192,11 +191,12 @@ var LINECHART = (function(){
 		sizeOfCircles = defaultCircleSize;
 		circlesC = defaultCircleColor;
 	},
-	defaults5: function(defaultCircle, defaultPath, defaultSharpSmooth, defaultFill, defaultEstimatedvalues, defaultSelectAll)
+	defaults5: function(defaultCircle, defaultPath, defaultSharpSmooth, defaultFill, defaultFahrCels, defaultEstimatedvalues, defaultSelectAll)
 	{
 		circleOnOffDefault = defaultCircle;
 		pathOnOffDefault = defaultPath;
 		fillDefault = defaultFill;
+		fahrCelsDefault = defaultFahrCels;
 		estimatedValues = defaultEstimatedvalues;
 		selectAllPaths = defaultSelectAll;
 		if (defaultSharpSmooth == true)
@@ -223,7 +223,6 @@ var LINECHART = (function(){
 		var paths2 = new Array();
 		var pathsBegin = new Array();
 		var circles = new Array();
-		var startStop = 1;
 		var displayPoints = new Array();
 		var timeAtPoint = new Array();
 		var data = new Array();
@@ -280,11 +279,10 @@ var LINECHART = (function(){
 		$(divCirclesOnOff).html("<input type='button' onclick='LINECHART.circlesOnOffFunction()' id='butCirclesOnOff'></button>");
 		$(divSharpSmooth).html("<input type='button' onclick='LINECHART.sharpSmoothFunction()' id='butSharpSmooth'></button>");
 		$(divFill).html("<input type='button' onclick='LINECHART.fillFunction()' id='butFill'></button>")
+		$(divFahrCels).html("<input type='button' onclick='LINECHART.fahrCelsFunction()' id='butFahrCels'></button>")
 		$(divEstimatedValues).html("<input type='button' onclick='LINECHART.estimatedValuesFunction()' id='butEstimatedValues'></button>");
 		$(divSelectAll).html("<input type='button' id='butSelectAll'></button>");
-		$(divStart).html("<input type='button' onclick='LINECHART.Start()' id='butStart' value='Start'></input>");
-		$(divStop).html("<input type='button' onclick='LINECHART.Stop()' id='butStop' value='Stop'></input>");
-		$(divReset).html("<input type='button' onclick='LINECHART.Reset()' id='butReset' value='Reset'></input>");
+		$(divCSV).html("<input type='file' onclick='LINECHART.Start();' id='butCSV' value='Browse CSV'></input>");
 		$(divLineButtons).html("<span id='lineButtons'></span>");
 		$(divSelectedOption).html("<span id='selectedOption'></span>");
 		$(divStatus).html("<span id='status'></span>");
@@ -304,6 +302,10 @@ var LINECHART = (function(){
 			butPathOnOff.value = "Paths Off";
 		else
 			butPathOnOff.value = "Paths";
+		if (fahrCelsDefault == true)
+			butFahrCels.value = "Celsius";
+		else
+			butFahrCels.value = "Fahrenheit";
 		if (fillDefault == true)
 			butFill.value = "Fill Off";
 		else
@@ -312,76 +314,45 @@ var LINECHART = (function(){
 			butEstimatedValues.value = "Real Values";
 		else
 			butEstimatedValues.value = "Estimated Values";
-		
-		//-------------------------Socket IO--------------------------------
-		/*
-		var socket = io.connect(thisLocalHost);
-		socket.on('connect', function () {
-			socket.on(thisMsgTopic, function (msg) {
-				var elmarr=msg.topic.split("/");
-				var elm=elmarr[3];
-				console.log("TEMP:"+msg.topic+' '+msg.payload);
-				$('#'.concat(elm)).html(msg.payload);
-				fromTheCloud = eval("("+msg.payload+")");
-				for (var i = 0; i < (fromTheCloud.length - 1); i++)
-				{
-					if (eachPathData[i] != fromTheCloud[i])
-					newDataIn[i] = true
-					eachPathData[i] = fromTheCloud[i]
+		var count = 0;
+		numberOfPaths = 5;
+		function generateData(){
+			for (var i = 0; i < CSVContents.length; i++)
+			{
+				var s = CSVContents[i][0];
+				s = "20" + s.substring(0, 2) + '-' + s.substring(2, 4) + '-' + s.substring(4, 6) + 'T' + s.substring(6, 8) + ':' + s.substring(8, 10) + ':' + s.substring(10, 12);
+				timeIn=new Date(s);
+				for (var j = 1; j < CSVContents[0].length; j++) {
+			//		newDataIn[i-1] = true;
+					eachPathData[j-1] = 100 * CSVContents[i][j];
 				}
-				numberOfPaths = (eachPathData.length);
-				timeIn = fromTheCloud[fromTheCloud.length - 1];
-			});
-			socket.emit('subscribe',{topic:thisMsgTopic});
-		});
-		var socket = io.connect(thisLocalHost);
-		socket.on('connect', function () {
-			socket.on('mqtt', function (msg) {
-				var elmarr=msg.topic.split("/");
-				var elm=elmarr[3];
-				$('#'.concat(elm)).html(msg.payload);
-			});
-			socket.emit('subscribe',{topic:thisMsgTopic});
-		});*/
-
-		//-------------- Random values for testing ---------------
-		for (var i = 0; i < 5; i++)
-		{
-			newDataIn[i] = true;
-			eachPathData[i] = Math.floor(100 * Math.random())
+			}
+			for (var i = 1; i < CSVContents[0].length; i++)
+				newDataIn[i-1] = true;
 		}
-		numberOfPaths = eachPathData.length-1;
-		setInterval(function()
-		{
-			newDataIn[0] = true;
-			eachPathData[0] = 100 * Math.random();
-			timeIn=new Date().getTime();
-		}, 700);
-		setInterval(function()
-		{
-			newDataIn[1] = true;
-			eachPathData[1] = 20 * Math.random() + 20;
-			timeIn=new Date().getTime();
-		}, 500);
-		setInterval(function()
-		{
-			newDataIn[2] = true;
-			eachPathData[2] = 20 * Math.random() + 40;
-			timeIn=new Date().getTime();
-		}, 1500);
-		setInterval(function()
-		{
-			newDataIn[3] = true;
-			eachPathData[3] = 20 * Math.random() + 60;
-			timeIn=new Date().getTime();
-		}, 275);
-		setInterval(function()
-		{
-			newDataIn[4] = true;
-			eachPathData[4] = 20 * Math.random() + 80;
-			timeIn=new Date().getTime();
-		}, 800);
-		 
+		function readCSV(evt) {
+			var files = evt.target.files;
+			if (files) {
+				for (var i = 0, f; f = files[i]; i++) {
+					var r = new FileReader();
+					r.onload = (function (f) {
+						return function (e) {
+							CSVContents = e.target.result;
+							CSVContents = CSVContents.split('\n')
+							for (var i = 0; i < CSVContents.length; i++) {
+								CSVContents[i] = CSVContents[i].split('\t');
+							}
+							generateData();
+						};
+					})(f);
+					r.readAsText(f);
+				}
+			}
+			else {
+				alert("Failed to load files");
+			}
+		}
+		document.getElementById('butCSV').addEventListener('change', readCSV, false);
 		$("#status").html(".") //Empty the div shown for the status
 		$("#clickedStatus").html(".")
 		x = d3.scale.linear().domain([0, sizeOfDomain]).range([m, w]);
@@ -810,8 +781,6 @@ var LINECHART = (function(){
 		butSharpSmooth.disabled = true;
 		butFill.disabled = true;
 		butSelectAll.disabled = true;
-		butStop.disabled = true;
-		butReset.disabled = true;
 		LINECHART.createUserInterface = function(){
 			var bisectDate = d3.bisector(function(d) { return d.data2; }).left; //Hover Values
 			var focus = vis.append("g")
@@ -1539,6 +1508,16 @@ var LINECHART = (function(){
 				transitioning = "true";
 			}
 		}
+		LINECHART.fahrCelsFunction = function() {
+			if (fahrCels == true) {
+				fahrCels = false
+				butFahrCels.value = "Celsius";
+			}
+			else {
+				fahrCels = true
+				butFahrCels.value = "fahrenheit";
+			}
+		}
 		//Changing the Domain Size
 		LINECHART.newDomain = function(element, index, array){
 			oldData[index] = data[index]
@@ -1612,42 +1591,6 @@ var LINECHART = (function(){
 				.transition().duration(200).style("stroke", "red").style("fill", "red").attr("r", sizeOfCircles[ils]*2)
 				.transition().duration(200).style("stroke", circlesC[ils]).style("fill", circlesC[ils]).attr("r", sizeOfCircles[ils])
 		}
-		//Path Reset Function
-		LINECHART.resetingEachPath = function(element, index, array){
-			if (selectAllPaths == true)
-				ils = index;
-			for (var i = 0; i < sizeOfDomain; i++)
-			{
-				data[ils][i] = rangeMin[ils];
-				data2[ils][i] = rangeMin[ils];
-			}
-		}
-		//Reset Function
-		LINECHART.Reset = function(){
-			if (selectAllPaths == true)
-			{
-				transitioning = "all";
-				eachPathData.forEach(LINECHART.resetingEachPath);
-				$('#selectedOption').html( "Reset all paths");
-			}
-			else
-			{
-				transitioning = "false";
-				ils = lineSelect;
-				LINECHART.resetingEachPath();
-				$('#selectedOption').html( "Path" + (lineSelect + 1) + " reset.");
-			}
-			assignPaths();
-			createPaths();
-			appendCircles();
-			transitioning = "true"
-		}
-		//Stop Function
-		LINECHART.Stop = function(){
-			startStop = 0;
-			butStop.disabled = true;
-			butStart.disabled = false;
-		}
 		//When start button is pressed
 		LINECHART.Start = function()
 		{
@@ -1703,6 +1646,7 @@ var LINECHART = (function(){
 		}
 		//Edit the paths
 		function makeEachPathStart(element, index, array) {
+			console.log(index);
 			ils = index;
 			pathOnOff[index] = pathOnOffDefault;
 			circlesOnOff[index] = circleOnOffDefault;
@@ -1776,16 +1720,12 @@ var LINECHART = (function(){
 				}
 			}
 			$('#lineButtons').append("<input type='button' onclick='LINECHART.changeLineSelected(" + index + "); LINECHART.ils = LINECHART.lineSelect; LINECHART.unselectPaths(); LINECHART.lineSelected()' value='" + data_type[index] + "'></input>");
-			startStop = 1;
 			vis.each(Everything);
 			function Everything (){
 			thisIsEverything = d3.select(this);
 			//-----------------------All of the following functions repeat-------------------------
 
 			(function totalEverythingRepeat() {
-			//Stop everything when "stop" button is pressed
-			if (startStop == 0)
-			return;
 			thisIsEverything = thisIsEverything.transition()
 
 			//Only allow processes to continue when data comes in
@@ -1793,7 +1733,6 @@ var LINECHART = (function(){
 			{
 			if (oldEachPathDataLength < eachPathData.length)
 			{
-				startStop = 0;
 				Start();
 			}
 			oldEachPathDataLength = eachPathData.length;
@@ -1937,9 +1876,6 @@ var LINECHART = (function(){
 			butSharpSmooth.disabled = false;
 			butFill.disabled = false;
 			butSelectAll.disabled = false;
-			butStart.disabled = true;
-			butStop.disabled = false;
-			butReset.disabled = false;
 			function slidePathBegin() { //Path Motion Functions
 				if (transitioning == "true")
 				{

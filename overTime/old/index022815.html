@@ -72,6 +72,7 @@
 						<td id="inSharpSmooth"></td>
 						<td id="inFill"></td>
 						<td id="inEstimatedValues"></td>
+						<td id="inFahrCels"></td>
 						<td id="inSelectAll"></td>
 						<td id="theSelectedOption"></td>
 					</tr>
@@ -107,6 +108,7 @@
 	<script type="text/javascript" src="../lib/socket.io.min.js"></script>
 	<script type="text/javascript" src="../lib/jquery-1.4.2.js"></script>
 	<script type="text/javascript" src="../lib/jquery.flot.js"></script>
+	<script type="text/javascript" src="../lib/jquery.csv.js"></script>
 	<script type="text/javascript" src="lineChart.js"></script>
 	<!--script type="text/javascript" src="lib/mqttws31.js"></script-->
 	<script type="text/javascript">
@@ -122,7 +124,7 @@
 		//X Label, Y Label, Range Minimum, Range Maximum
 		LINECHART.options4("#inXLabel", "#inYLabel", "#inRangeMin", "#inRangeMax");
 		//Toggle Buttons for Plot Circles, Paths, Sharp/Smooth, Fill, Estimated Values, Select All
-		LINECHART.options5("#inCirclesOnOff", "#inPathOnOff", "#inSharpSmooth", "#inFill", "#inEstimatedValues", "#inSelectAll");
+		LINECHART.options5("#inCirclesOnOff", "#inPathOnOff", "#inSharpSmooth", "#inFill", "#inFahrCels", "#inEstimatedValues", "#inSelectAll");
 		//Buttons for start, stop, reset, path select
 		LINECHART.options6("#theStart", "#theStop", "#theReset", "#theLineButtons");
 		//Status, Clicked Status, Selected Option
@@ -136,8 +138,8 @@
 		LINECHART.defaults3(15, 1500, [0, 20, 40, 60, 80], [100, 40, 60, 80, 100], ["°C", "lm", "Hz", "bpm", "br/m"]);
 		//Path width, Path Color, Plot Circle Size, Plot Circle Color
 		LINECHART.defaults4(); //Left blank for defaults
-		//Plot On/Off, Paths On/Off, Sharp/Smooth, Fill On/Off, Estimated in-between Values On/Off, Select All
-		LINECHART.defaults5(false, true, false, false, true, false);
+		//Plot On/Off, Paths On/Off, Sharp/Smooth, Fill On/Off, Fahrenheit/Celsius, Estimated in-between Values On/Off, Select All
+		LINECHART.defaults5(false, true, false, false, false, true, false);
 		//Path Select Text []
 		LINECHART.defaults6(["Room Temperature", "Light", "Sound", "Heart Rate", "Respiratory Rate"]);
 		LINECHART.createLineChart();

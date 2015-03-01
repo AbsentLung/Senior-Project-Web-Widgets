@@ -30,7 +30,6 @@ var LINECHART = (function(){
 	var rangeMaxF;
 	var rangeMin = new Array();
 	var rangeMax = new Array();
-	var endString = new Array();
 	var divDomain
 	var divCircleColor
 	var divCircleSize
@@ -62,7 +61,6 @@ var LINECHART = (function(){
 	var divClickedStatus
 	var lineSelect = 0;
 	var ils;
-	var data_type = new Array();
 	var y = new Array();
 	var x;
 	return {
@@ -166,18 +164,23 @@ var LINECHART = (function(){
 		axisC = defaultAxisColor;
 		yyTicks = defaultTicks;
 	},
-	defaults3: function(defaultDomain, defaultValues, defaultRangeMin, defaultRangeMax, defaultEndString)
+	defaults3: function(defaultDomain, defaultValues, defaultRangeMin0, defaultRangeMax0, defaultRangeMin1, defaultRangeMax1,
+				defaultRangeMin2, defaultRangeMax2, defaultRangeMin3, defaultRangeMax3, defaultRangeMin4, defaultRangeMax4)
 	{
 		sizeOfDomain = defaultDomain;
 		values = defaultValues;
-		for (var i = 0; i < defaultRangeMin.length; i++) {
-			rangeMin[i] = defaultRangeMin[i];
-			rangeMax[i] = defaultRangeMax[i];
-			y[i] = d3.scale.linear().domain([rangeMin[i], rangeMax[i]]).range([0 + m, h - m]);
-			endString[i] = defaultEndString[i];
-		}
+		rangeMin[0] = defaultRangeMin0;
+		rangeMax[0] = defaultRangeMax0;
+		rangeMin[1] = defaultRangeMin0;
+		rangeMax[1] = defaultRangeMax0;
+		rangeMin[2] = defaultRangeMin0;
+		rangeMax[2] = defaultRangeMax0;
+		rangeMin[3] = defaultRangeMin0;
+		rangeMax[3] = defaultRangeMax0;
+		rangeMin[4] = defaultRangeMin0;
+		rangeMax[4] = defaultRangeMax0;
 	},
-	defaults4: function(defaultPathWidth, defaultPathColor, defaultCircleSize, defaultCircleColor)
+	defaults4: function(defaultPathWidth, defaultPathColor)
 	{
 		if (isNaN(defaultPathColor) == true)
 				defaultPathColor = []
@@ -185,6 +188,9 @@ var LINECHART = (function(){
 				defaultPathWidth = []
 		pathWidth = defaultPathWidth
 		pathColor = defaultPathColor
+	},
+	defaults5: function(defaultCircleSize, defaultCircleColor)
+	{
 		if (isNaN(defaultCircleColor) == true)
 				defaultCircleColor = []
 		if (isNaN(defaultCircleSize) == true)
@@ -192,7 +198,7 @@ var LINECHART = (function(){
 		sizeOfCircles = defaultCircleSize;
 		circlesC = defaultCircleColor;
 	},
-	defaults5: function(defaultCircle, defaultPath, defaultSharpSmooth, defaultFill, defaultEstimatedvalues, defaultSelectAll)
+	defaults6: function(defaultCircle, defaultPath, defaultSharpSmooth, defaultFill, defaultEstimatedvalues, defaultSelectAll)
 	{
 		circleOnOffDefault = defaultCircle;
 		pathOnOffDefault = defaultPath;
@@ -203,12 +209,6 @@ var LINECHART = (function(){
 			sharpSmoothDefault = "linear";
 		else
 			sharpSmoothDefault = "monotone";
-	},
-	defaults6: function(datas)
-	{
-		for (var i = 0; i < datas.length; i++) {
-			data_type[i] = datas[i];
-		}
 	},
 	creatorGenerateChart: function(mcd, bcdiv, tlh, tmt, tmt2)
 	{
@@ -323,7 +323,7 @@ var LINECHART = (function(){
 				console.log("TEMP:"+msg.topic+' '+msg.payload);
 				$('#'.concat(elm)).html(msg.payload);
 				fromTheCloud = eval("("+msg.payload+")");
-				for (var i = 0; i < (fromTheCloud.length - 1); i++)
+				for (i = 0; i < (fromTheCloud.length - 1); i++)
 				{
 					if (eachPathData[i] != fromTheCloud[i])
 					newDataIn[i] = true
@@ -345,7 +345,7 @@ var LINECHART = (function(){
 		});*/
 
 		//-------------- Random values for testing ---------------
-		for (var i = 0; i < 5; i++)
+		for (i = 0; i < 5; i++)
 		{
 			newDataIn[i] = true;
 			eachPathData[i] = Math.floor(100 * Math.random())
@@ -353,37 +353,36 @@ var LINECHART = (function(){
 		numberOfPaths = eachPathData.length-1;
 		setInterval(function()
 		{
-			newDataIn[0] = true;
-			eachPathData[0] = 100 * Math.random();
+			for (i = 0; i < 2; i++)
+			{
+				newDataIn[i] = true;
+				eachPathData[i] = 100 * Math.random();
+			}
+			setTimeout(function()
+			{
+				newDataIn[2] = true;
+				eachPathData[2] = 100 * Math.random();
+			}, 1000);
+			setTimeout(function()
+			{
+				newDataIn[3] = true;
+				eachPathData[3] = 100 * Math.random();
+			}, 3000);
+			setTimeout(function()
+			{
+				newDataIn[4] = true;
+				eachPathData[4] = 100 * Math.random();
+			}, 4000);
 			timeIn=new Date().getTime();
-		}, 700);
-		setInterval(function()
-		{
-			newDataIn[1] = true;
-			eachPathData[1] = 20 * Math.random() + 20;
-			timeIn=new Date().getTime();
-		}, 500);
-		setInterval(function()
-		{
-			newDataIn[2] = true;
-			eachPathData[2] = 20 * Math.random() + 40;
-			timeIn=new Date().getTime();
-		}, 1500);
-		setInterval(function()
-		{
-			newDataIn[3] = true;
-			eachPathData[3] = 20 * Math.random() + 60;
-			timeIn=new Date().getTime();
-		}, 275);
-		setInterval(function()
-		{
-			newDataIn[4] = true;
-			eachPathData[4] = 20 * Math.random() + 80;
-			timeIn=new Date().getTime();
-		}, 800);
+		},5000);
 		 
 		$("#status").html(".") //Empty the div shown for the status
 		$("#clickedStatus").html(".")
+		y[0] = d3.scale.linear().domain([rangeMin[0], rangeMax[0]]).range([0 + m, h - m]); //X and Y objects
+		y[1] = d3.scale.linear().domain([rangeMin[1], rangeMax[1]]).range([0 + m, h - m]); //X and Y objects
+		y[2] = d3.scale.linear().domain([rangeMin[2], rangeMax[2]]).range([0 + m, h - m]); //X and Y objects
+		y[3] = d3.scale.linear().domain([rangeMin[3], rangeMax[3]]).range([0 + m, h - m]); //X and Y objects
+		y[4] = d3.scale.linear().domain([rangeMin[4], rangeMax[4]]).range([0 + m, h - m]); //X and Y objects
 		x = d3.scale.linear().domain([0, sizeOfDomain]).range([m, w]);
 		belowChart = document.getElementById(belowChartDiv); //Append Div below the Chart
 		$(mainChartDiv).append(belowChart);
@@ -449,19 +448,37 @@ var LINECHART = (function(){
 			.attr("transform", "translate(0, " + h + ")")
 		var lineChartPathBegin = vis.append("g")
 			.attr("transform", "translate(0, " + h + ")")
-		var lineChartIntro = vis.append("g")
+		var lineChartLogo = vis.append("g")
 			.attr("transform", "translate(0, " + h + ")")
 		var linesPath = lineChartPath.selectAll("path");
 		var linesPath2 = lineChartPath2.selectAll("path");
 		var linesPathBegin = lineChartPathBegin.selectAll("path");
 		var pathDiv = vis.append("g");
 		var axisCircles = pathDiv.selectAll("circle");
+		var lineChartYLabel = lineChart.selectAll(".yLabel")
+			.data(y[0].ticks(4))
+			.enter().append("text")
+			.attr("class", "yLabel")
+			.text(String)
+			.attr("x", m - 30)
+			.attr("y", function(d) { return -1 * y[0](d) })
+			.attr("text-anchor", "right")
+			.attr("dy", 4)
 		var lineChartXLine = lineChart.append("line")
 			.attr("x1", x(0))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(0))
 			.attr("y2", -1 * y[0](rangeMax[0]))
 			.style("stroke", axisC);
+		var lineChartYTicks = lineChart.selectAll(".yTicks")
+			.data(y[0].ticks(yyTicks))
+			.enter().append("line")
+			.attr("class", "yTicks")
+			.attr("y1", function(d) { return -1 * y[0](d); })
+			.attr("x1", x(0))
+			.attr("y2", function(d) { return -1 * y[0](d); })
+			.attr("x2", m + 20)
+			.style("stroke", axisC)
 		var lineChartXTicks = lineChart.selectAll(".xTicks")
 			.data(x.ticks(1))
 			.enter().append("line")
@@ -481,41 +498,8 @@ var LINECHART = (function(){
 			.text(butYLabel.value)
 			.attr("x", x(0) - 30)
 			.attr("y", -1 * y[0](rangeMax[0]) - 25)
-		var lineChartYLabel = lineChart.selectAll(".yLabel");
-		var lineChartYTicks = lineChart.selectAll(".yTicks")
-		function generateYLabel() {
-			lineChartYLabel.remove();
-			lineChartYLabel = lineChart.selectAll(".yLabel")
-				.data(function(){
-					if (ils == lineSelect)
-						return y[lineSelect].ticks(4)
-					else
-						return 0;
-				})
-				.enter().append("text")
-				.attr("class", "yLabel")
-				.text(String)
-				.attr("x", m - 30)
-				.attr("y", function(d) { return -1 * y[ils](d) })
-				.attr("text-anchor", "right")
-				.attr("dy", 4)
-		}
-		function generateYTicks() {
-			lineChartYTicks.remove();
-			lineChartYTicks = lineChart.selectAll(".yTicks")
-			.data(y[0].ticks(yyTicks))
-			.enter().append("line")
-			.attr("class", "yTicks")
-			.attr("y1", function(d) { return -1 * y[0](d); })
-			.attr("x1", x(0))
-			.attr("y2", function(d) { return -1 * y[0](d); })
-			.attr("x2", m + 20)
-			.style("stroke", axisC)
-		}
-		generateYLabel();
-		generateYTicks();
 		//Generate Logo
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(0))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(0))
@@ -528,7 +512,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0](2 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(3))
 			.attr("y2", -1 * y[0](2 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(0))
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) * 35 / 100 + rangeMin[0]))
 			.attr("x2", x(0))
@@ -541,7 +525,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0](2 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(1))
 			.attr("y2", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(0))
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) * 70 / 100 + rangeMin[0]))
 			.attr("x2", x(0))
@@ -554,7 +538,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(3))
 			.attr("y2", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(0))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(1))
@@ -567,7 +551,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(3))
 			.attr("y2", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(1))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(2))
@@ -580,7 +564,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(3))
 			.attr("y2", -1 * y[0](2 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(2))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(3))
@@ -593,7 +577,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(4))
 			.attr("y2", -1 * y[0](4 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(3))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(4))
@@ -606,7 +590,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(6))
 			.attr("y2", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(4))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(4))
@@ -619,7 +603,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(9))
 			.attr("y2", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(4))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(5))
@@ -632,7 +616,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(7))
 			.attr("y2", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(5))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(6))
@@ -645,7 +629,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(9))
 			.attr("y2", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(6))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(7))
@@ -658,7 +642,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0](2 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(9))
 			.attr("y2", -1 * y[0](2 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(7))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(8))
@@ -671,7 +655,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0](2 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(9))
 			.attr("y2", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(8))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(9))
@@ -684,7 +668,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(12))
 			.attr("y2", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(9))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(9))
@@ -697,7 +681,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0](2 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(12))
 			.attr("y2", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(9))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(10))
@@ -710,7 +694,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(12))
 			.attr("y2", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(10))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(11))
@@ -723,7 +707,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0](2 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(12))
 			.attr("y2", -1 * y[0](2 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(11))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(12))
@@ -736,7 +720,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(10))
 			.attr("y2", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(12))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(13))
@@ -749,7 +733,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(15))
 			.attr("y2", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(13))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(14))
@@ -762,7 +746,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(15))
 			.attr("y2", -1 * y[0](3 * (rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(14))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(14))
@@ -775,7 +759,7 @@ var LINECHART = (function(){
 			.attr("y1", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]))
 			.attr("x2", x(15))
 			.attr("y2", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 5 + rangeMin[0]));
-		lineChartIntro.append("line")
+		lineChartLogo.append("line")
 			.attr("x1", x(14))
 			.attr("y1", -1 * y[0](rangeMin[0]))
 			.attr("x2", x(15))
@@ -846,32 +830,29 @@ var LINECHART = (function(){
 							if (isNaN(data2Times[lineSelect]) == true) {
 								data2Times[lineSelect] = []
 							}
-							for (var i = 0; i <= sizeOfDomain; i++) {
+							for (i = 0; i <= sizeOfDomain; i++) {
 								data2Times[lineSelect][i] = new Date(data2[lineSelect][i]);
 							}
-							inputTextY = ( ( ((y[lineSelect](data[lineSelect][Math.round(XpageX - 1)]) - m - 89)  / (h-m*2) * (100)) 
-								+ (25.42857142857143*(350/(h-m*2)))) * (rangeMax[lineSelect] - rangeMin[lineSelect]) / 100
-								+ rangeMin[lineSelect] ).toFixed(2);
-							$('#status').html( data2Times[lineSelect][Math.round(XpageX) - 1].toTimeString()
-								+', '+ inputTextY + endString[lineSelect]);
+							inputTextY = ( ( ((y[0](data[lineSelect][Math.round(XpageX - 1)]) - m - 89)  / (h-m*2) * (100)) 
+								+ (25.42857142857143*(350/(h-m*2)))) * (rangeMax[0] - rangeMin[0]) / 100 + rangeMin[0] ).toFixed(2);
+							$('#status').html( data2Times[lineSelect][Math.round(XpageX) - 1].toTimeString() +', '+ inputTextY + "°");
 							focus.attr("transform", "translate(" + (Math.round(XpageX) * ((w - m)/sizeOfDomain) + m)
-								+ "," + y[lineSelect]((rangeMax[lineSelect] - data[lineSelect][Math.round(XpageX) - 1])
-								+ rangeMin[lineSelect])  + ")");
+								+ "," + y[0]((rangeMax[0] - data[lineSelect][Math.round(XpageX) - 1]) + rangeMin[0])  + ")");
 							focus.select("text").text( data2Times[lineSelect][Math.round(XpageX) - 1].toTimeString().substring(0, 8)
-								+', '+ inputTextY + endString[lineSelect]).attr("transform", "translate(10, 10)");
+								+', '+ inputTextY + "°").attr("transform", "translate(10, 10)");
 						}
 						else
 						{
 							inputTextY = ((100 - 25.42857142857143*(350/(h-m*2))
 								- (displayPoints[lineSelect][(pageXFixed - 1)*(values/sizeOfDomain)][1] - m - 89)
-								/ (h-m*2) * (100)) * (rangeMax[lineSelect] - rangeMin[lineSelect]) / 100 + rangeMin[lineSelect] ).toFixed(2);
+								/ (h-m*2) * (100)) * (rangeMax[0] - rangeMin[0]) / 100 + rangeMin[0] ).toFixed(2);
 							$('#status').html(timeAtPoint[lineSelect][(pageXFixed - 2)*(values/sizeOfDomain)].toTimeString()
-								+', '+ inputTextY + endString[lineSelect]);
+								+', '+ inputTextY + "°");
 							focus.attr("transform", "translate(" + (ePageX - 7)+ ","
 								+ displayPoints[lineSelect][(values/sizeOfDomain)* (pageXFixed - 1)][1] + ")");
 							focus.select("text").text( timeAtPoint[lineSelect][(pageXFixed - 1)
 								* (values/sizeOfDomain)].toTimeString().substring(0, 8) +', '
-								+ inputTextY + endString[lineSelect]).attr("transform", "translate(10, 10)");
+								+ inputTextY + "°").attr("transform", "translate(10, 10)");
 						}
 					}
 				}
@@ -885,20 +866,23 @@ var LINECHART = (function(){
 				if (selectAllPaths == false)
 				{
 					focus.style("display", null);
+					var mousedPath = d3.select(this);
+					mousedPath = mousedPath
+					.transition()
 					if (estimatedValues == false)
 					{
 						if (data2Times[lineSelect][Math.round(XpageX)] != null && inputTextY != null)
 							$('#clickedStatus').html( data2Times[lineSelect][Math.round(XpageX) - 1]
-								+ ", " + inputTextY + endString[lineSelect]);
+								+ ", Temperature is at " + inputTextY + "°Celsius");
 						else
-							$('#clickedStatus').html("Error.. Try again");
+							$('#clickedStatus').html("There was an error. Please try again");
 					}
 					else
 					{
 						if (displayPoints[lineSelect][(pageXFixed - 2)*(values/sizeOfDomain)] != null
 							&& timeAtPoint[lineSelect][(pageXFixed - 2) * (values/sizeOfDomain)] != null)
 							$('#clickedStatus').html( timeAtPoint[lineSelect][(pageXFixed - 1)*(values/sizeOfDomain)]
-								+ ", " + inputTextY + endString[lineSelect]);
+								+ ", Temperature is at " + inputTextY + "°Celsius");
 							else
 								$('#clickedStatus').html("There was an error. Please try again");
 					}
@@ -1052,14 +1036,14 @@ var LINECHART = (function(){
 					butPathOnOff.value = "Path Off";
 				}
 				paths[ils]
-					.style("fill-opacity", slidePathVisibility[ils]/100)
-					.style("opacity", slidePathVisibility[ils])
+				.style("fill-opacity", slidePathVisibility[ils]/100)
+				.style("opacity", slidePathVisibility[ils])
 				paths2[ils]
-					.style("fill-opacity", slidePathVisibility[ils]/100)
-					.style("opacity", slidePathVisibility[ils])
+				.style("fill-opacity", slidePathVisibility[ils]/100)
+				.style("opacity", slidePathVisibility[ils])
 				pathsBegin[ils]
-					.style("fill-opacity", slidePathVisibility[ils]/100)
-					.style("opacity", slidePathVisibility[ils])
+				.style("fill-opacity", slidePathVisibility[ils]/100)
+				.style("opacity", slidePathVisibility[ils])
 			}
 		}
 		LINECHART.circleSize = function(e) {
@@ -1120,7 +1104,7 @@ var LINECHART = (function(){
 					}
 				}
 				else
-					$('#selectedOption').html( "Circles Color: 3 digit hex or 6 digit hex");
+				$('#selectedOption').html( "Circles Color: 3 digit hex or 6 digit hex");
 			}
 		}
 		LINECHART.axisCFunct = function(e){
@@ -1229,9 +1213,7 @@ var LINECHART = (function(){
 				{
 					h = parseFloat(buth.value);
 					$('#selectedOption').html( "Height: " + h);
-					for (var i = 0; i < 5; i++) {
-						y[i] = d3.scale.linear().domain([rangeMin[i], rangeMax[i]]).range([0 + m, h - m]);
-					}
+					y = d3.scale.linear().domain([rangeMin[0], rangeMax[0]]).range([0 + m, h - m])
 					lineChart
 						.transition()
 						.duration(500)
@@ -1248,7 +1230,7 @@ var LINECHART = (function(){
 						.transition()
 						.duration(500)
 						.attr("transform", "translate(0, " + h + ")")
-					lineChartIntro
+					lineChartLogo
 						.transition()
 						.duration(500)
 						.attr("transform", "translate(0, " + h + ")")
@@ -1344,10 +1326,8 @@ var LINECHART = (function(){
 				{
 					m = parseFloat(butm.value);
 					$('#selectedOption').html( "Margin: " + m);
-					x = d3.scale.linear().domain([0, sizeOfDomain]).range([m, w]);
-					for (var i = 0; i < 5; i++) {
-						y[i] = d3.scale.linear().domain([rangeMin[i], rangeMax[i]]).range([0 + m, h - m]);
-					}
+					x = d3.scale.linear().domain([0, sizeOfDomain]).range([m, w]),
+					y = d3.scale.linear().domain([rangeMin[0], rangeMax[0]]).range([0 + m, h - m])
 					lineChartYLabel
 						.transition()
 						.duration(500)
@@ -1399,17 +1379,35 @@ var LINECHART = (function(){
 		}
 		LINECHART.rangeMinF = function(e) {
 			if (e.keyCode == 13) {
-				if (isNaN(butRangeMin.value) == false && butRangeMin.value <= rangeMax[lineSelect])
+				if (isNaN(butRangeMin.value) == false && butRangeMin.value <= rangeMax[0])
 				{
-					rangeMin[lineSelect] = parseFloat(butRangeMin.value);
-					$('#selectedOption').html( "Range Minimum: " + rangeMin[lineSelect]);
-					y[lineSelect] = d3.scale.linear().domain([rangeMin[lineSelect], rangeMax[lineSelect]]).range([0 + m, h - m]);
-					generateYLabel();
-					generateYTicks();
+					rangeMin[0] = parseFloat(butRangeMin.value);
+					$('#selectedOption').html( "Range Minimum: " + rangeMin[0]);
+					y = d3.scale.linear().domain([rangeMin[0], rangeMax[0]]).range([0 + m, h - m])
+					lineChartYLabel.remove();
+					lineChartYLabel = lineChart.selectAll(".yLabel")
+						.data(y.ticks(4))
+						.enter().append("text")
+						.attr("class", "yLabel")
+						.text(String)
+						.attr("x", m - 30)
+						.attr("y", function(d) { return -1 * y[0](d) })
+						.attr("text-anchor", "right")
+						.attr("dy", 4)
 					lineChartXLine
 						.transition()
 						.duration(500)
 						.attr("y1", -1 * y[0](rangeMin[0]))
+					lineChartYTicks.remove()
+					lineChartYTicks = lineChart.selectAll(".yTicks")
+						.data(y.ticks(yyTicks))
+						.enter().append("line")
+						.attr("class", "yTicks")
+						.attr("y1", function(d) { return -1 * y[0](d); })
+						.attr("x1", x(0))
+						.attr("y2", function(d) { return -1 * y[0](d); })
+						.attr("x2", m + 20)
+						.style("stroke", axisC)
 					lineChartXTicks
 						.transition()
 						.duration(500)
@@ -1419,14 +1417,10 @@ var LINECHART = (function(){
 						.transition()
 						.duration(500)
 						.attr("y", 37 - y[0](rangeMin[0]))
-					transitioning = "false";
+					transitioning = "all";
 					assignPaths();
 					appendCircles();
-					paths[lineSelect].transition().duration(500).attr("d", line)
-					paths2[lineSelect].transition().duration(500).attr("d", line)
-					pathsBegin[lineSelect].transition().duration(500).attr("d", lineBegin)
-					transitioning = "all";
-					pointsInBetweenPoints();
+					transitioning = "true";
 				}
 				else
 					$('#selectedOption').html( "Range Minimum: must be a valid number lower than the range maximum");
@@ -1436,30 +1430,44 @@ var LINECHART = (function(){
 		}
 		LINECHART.rangeMaxF = function(e) {
 			if (e.keyCode == 13) {
-				if (isNaN(butRangeMax.value) == false && butRangeMax.value >= rangeMin[lineSelect])
+				if (isNaN(butRangeMax.value) == false && butRangeMax.value >= rangeMin[0])
 				{
-					rangeMax[lineSelect] = parseFloat(butRangeMax.value);
-					$('#selectedOption').html( "Range Maximum: " + rangeMax[lineSelect]);
-					y[lineSelect] = d3.scale.linear().domain([rangeMin[lineSelect], rangeMax[lineSelect]]).range([0 + m, h - m]);
-					generateYLabel();
-					generateYTicks();
+					rangeMax[0] = parseFloat(butRangeMax.value);
+					$('#selectedOption').html( "Range Maximum: " + rangeMax[0]);
+					y = d3.scale.linear().domain([rangeMin[0], rangeMax[0]]).range([0 + m, h - m])
+					lineChartYLabel.remove();
+					lineChartYLabel = lineChart.selectAll(".yLabel")
+						.data(y.ticks(4))
+						.enter().append("text")
+						.attr("class", "yLabel")
+						.text(String)
+						.attr("x", m - 30)
+						.attr("y", function(d) { return -1 * y[0](d) })
+						.attr("text-anchor", "right")
+						.attr("dy", 4)
 					lineChartXLine
 						.transition()
 						.duration(500)
 						.attr("y2", -1 * y[0](rangeMax[0]))
+					lineChartYTicks.remove()
+					lineChartYTicks = lineChart.selectAll(".yTicks")
+						.data(y.ticks(yyTicks))
+						.enter().append("line")
+						.attr("class", "yTicks")
+						.attr("y1", function(d) { return -1 * y[0](d); })
+						.attr("x1", x(0))
+						.attr("y2", function(d) { return -1 * y[0](d); })
+						.attr("x2", m + 20)
+						.style("stroke", axisC)
 					lineChartXLabel
 						.transition()
 						.duration(500)
 						.attr("x", x(0) + 50)
 						.attr("y", 37 -y[0](rangeMin[0]))
-					transitioning = "false";
+					transitioning = "all";
 					assignPaths();
 					appendCircles();
-					paths[lineSelect].transition().duration(500).attr("d", line)
-					paths2[lineSelect].transition().duration(500).attr("d", line)
-					pathsBegin[lineSelect].transition().duration(500).attr("d", lineBegin)
-					transitioning = "all";
-					pointsInBetweenPoints();
+					transitioning = "true";
 				}
 				else
 					$('#selectedOption').html( "Range Maximum: must be a valid number higher than the range minimum");
@@ -1471,7 +1479,7 @@ var LINECHART = (function(){
 			if (e.keyCode == 13) {
 				$('#selectedOption').html( "X Label: " + butXLabel.value);
 				lineChartXLabel
-					.text(butXLabel.value)
+				.text(butXLabel.value)
 			}
 			else
 				$('#selectedOption').html( "X Label: " + butXLabel.value);
@@ -1480,7 +1488,7 @@ var LINECHART = (function(){
 			if (e.keyCode == 13) {
 				$('#selectedOption').html( "Y Label: " + butYLabel.value);
 				lineChartYLabel2
-					.text(butYLabel.value)
+				.text(butYLabel.value)
 			}
 			else
 				$('#selectedOption').html( "Y Label: " + butYLabel.value);
@@ -1494,7 +1502,7 @@ var LINECHART = (function(){
 					$('#selectedOption').html( "Ticks: " + yyTicks);
 					lineChartYTicks.remove();
 					lineChartYTicks = lineChart.selectAll(".yTicks")
-					.data(y[0].ticks(yyTicks))
+					.data(y.ticks(yyTicks))
 					.enter().append("line")
 					.attr("class", "yTicks")
 					.attr("y1", function(d) { return -1 * y[0](d); })
@@ -1544,15 +1552,15 @@ var LINECHART = (function(){
 			oldData[index] = data[index]
 			if (sizeOfDomain > oldDomainSize)
 			{
-				for (var i = 0; i < oldDomainSize; i++)
+				for (i = 0; i < oldDomainSize; i++)
 					data[index][i + differenceInDomain] = oldData[index][i]
-				for (var i = 0; i < differenceInDomain; i++)
+				for (i = 0; i < differenceInDomain; i++)
 					data[index][i] = rangeMin[0];
 			}
 			else
 			{
 				data[index] = new Array();
-				for (var i = 0; i < sizeOfDomain; i++)
+				for (i = 0; i < sizeOfDomain; i++)
 					data[index][i] = oldData[index][i + differenceInDomain]
 			}
 		}
@@ -1560,11 +1568,9 @@ var LINECHART = (function(){
 		LINECHART.lineSelected = function(element2, all, array2){
 			ils = lineSelect
 			$('#lineButtons').html("");
-			for (var i = 0; i < eachPathData.length; i++)
+			for (i = 0; i < eachPathData.length; i++)
 			{
-				$('#lineButtons').append("<input type='button' onclick='LINECHART.changeLineSelected("
-					+ i + "); LINECHART.ils = LINECHART.lineSelect; LINECHART.unselectPaths(); LINECHART.lineSelected()' value='"
-					+ data_type[i] + "'></input>");
+				$('#lineButtons').append("<input type='button' onclick='LINECHART.changeLineSelected(" + i + "); LINECHART.ils = LINECHART.lineSelect; LINECHART.unselectPaths(); LINECHART.lineSelected()' value='Path" + (i + 1) + "'></input>");
 			}
 			if (selectAllPaths == true)
 			{
@@ -1578,8 +1584,6 @@ var LINECHART = (function(){
 				butCircleColor.value = circlesC[lineSelect];
 				butPathC.value = pathColor[lineSelect];
 				butPathW.value = pathWidth[lineSelect];
-				butRangeMin.value = rangeMin[lineSelect];
-				butRangeMax.value = rangeMax[lineSelect];
 				if (circlesOnOff[lineSelect] == true)
 					butCirclesOnOff.value = "Circles Off";
 				else
@@ -1597,29 +1601,28 @@ var LINECHART = (function(){
 				else
 					butFill.value = "Fill"
 			}
-			generateYLabel();
 			$('#selectedOption').html( "");
 			paths[ils]
-				.transition().duration(200).style("stroke", "red").style("stroke-width", pathWidth[ils]*1.5)
-				.transition().duration(200).style("stroke", pathColor[ils]).style("stroke-width", pathWidth[ils]);
+			.transition().duration(200).style("stroke", "red").style("stroke-width", pathWidth[ils]*1.5)
+			.transition().duration(200).style("stroke", pathColor[ils]).style("stroke-width", pathWidth[ils]);
 			paths2[ils]
-				.transition().duration(200).style("stroke", "red").style("stroke-width", pathWidth[ils]*1.5)
-				.transition().duration(200).style("stroke", pathColor[ils]).style("stroke-width", pathWidth[ils]);
+			.transition().duration(200).style("stroke", "red").style("stroke-width", pathWidth[ils]*1.5)
+			.transition().duration(200).style("stroke", pathColor[ils]).style("stroke-width", pathWidth[ils]);
 			pathsBegin[ils]
-				.transition().duration(200).style("stroke", "red").style("stroke-width", pathWidth[ils]*1.5)
-				.transition().duration(200).style("stroke", pathColor[ils]).style("stroke-width", pathWidth[ils]);
+			.transition().duration(200).style("stroke", "red").style("stroke-width", pathWidth[ils]*1.5)
+			.transition().duration(200).style("stroke", pathColor[ils]).style("stroke-width", pathWidth[ils]);
 			circles[ils]
-				.transition().duration(200).style("stroke", "red").style("fill", "red").attr("r", sizeOfCircles[ils]*2)
-				.transition().duration(200).style("stroke", circlesC[ils]).style("fill", circlesC[ils]).attr("r", sizeOfCircles[ils])
+			.transition().duration(200).style("stroke", "red").style("fill", "red").attr("r", sizeOfCircles[ils]*2)
+			.transition().duration(200).style("stroke", circlesC[ils]).style("fill", circlesC[ils]).attr("r", sizeOfCircles[ils])
 		}
 		//Path Reset Function
 		LINECHART.resetingEachPath = function(element, index, array){
 			if (selectAllPaths == true)
 				ils = index;
-			for (var i = 0; i < sizeOfDomain; i++)
+			for (i = 0; i < sizeOfDomain; i++)
 			{
-				data[ils][i] = rangeMin[ils];
-				data2[ils][i] = rangeMin[ils];
+				data[ils][i] = rangeMin[0];
+				data2[ils][i] = rangeMin[0];
 			}
 		}
 		//Reset Function
@@ -1651,7 +1654,7 @@ var LINECHART = (function(){
 		//When start button is pressed
 		LINECHART.Start = function()
 		{
-			lineChartIntro.selectAll("line") //Sink the Deep Logo
+			lineChartLogo.selectAll("line") //Sink the Deep Logo
 				.transition()
 				.duration(2000)
 				.attr("y1", -1 * y[0](rangeMin[0]))
@@ -1662,14 +1665,14 @@ var LINECHART = (function(){
 				.attr("x1", x(0))
 				.attr("x2", x(sizeOfDomain))
 				.remove();
-/*			lineChart.append("text")
+			lineChart.append("text")
 				.attr("x", x(5))
 				.attr("y", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 2 + rangeMin[0]))
 				.transition()
 				.delay(1000)
 				.text("No information is currently being read in,"
 				+ " graph will transition when information is read in")
-*/			var renderGraph = false;
+			var renderGraph = false;
 			setInterval(function()
 			{
 				if (renderGraph == false) {
@@ -1688,7 +1691,16 @@ var LINECHART = (function(){
 		//Graph-Rendering Function
 		function startMain()
 		{
-			generateYLabel();
+			lineChart.selectAll("text").remove();
+			lineChartYLabel = lineChart.selectAll(".yLabel")
+				.data(y[0].ticks(4))
+				.enter().append("text")
+				.attr("class", "yLabel")
+				.text(String)
+				.attr("x", m - 30)
+				.attr("y", function(d) { return -1 * y[0](d) })
+				.attr("text-anchor", "right")
+				.attr("dy", 4)
 			lineChartXLabel = lineChart
 				.append("text")
 				.text(theXLabel)
@@ -1711,10 +1723,10 @@ var LINECHART = (function(){
 			if(data[index] == null){
 				data[index] = []
 				oldData[index] = []
-				for (var i = 0; i < sizeOfDomain; i++)
+				for (i = 0; i < sizeOfDomain; i++)
 				{
-					oldData[index][i] = rangeMin[index];
-					data[index][i] = rangeMin[index];
+					oldData[index][i] = rangeMin[0];
+					data[index][i] = rangeMin[0];
 				}
 				paths[index] = linesPath
 					.data([0])
@@ -1731,8 +1743,8 @@ var LINECHART = (function(){
 			}
 			if(data2[index] == null){
 				data2[index] = []
-				for (var i = 0; i < sizeOfDomain; i++)
-					data2[index][i] = rangeMin[index];
+				for (i = 0; i < sizeOfDomain; i++)
+					data2[index][i] = rangeMin[0];
 			}
 			if(pathWidth[index] == null){
 				pathWidth[index] = 2;
@@ -1775,7 +1787,7 @@ var LINECHART = (function(){
 					pathColor[index] = 'Blue';
 				}
 			}
-			$('#lineButtons').append("<input type='button' onclick='LINECHART.changeLineSelected(" + index + "); LINECHART.ils = LINECHART.lineSelect; LINECHART.unselectPaths(); LINECHART.lineSelected()' value='" + data_type[index] + "'></input>");
+			$('#lineButtons').append("<input type='button' onclick='LINECHART.changeLineSelected(" + index + "); LINECHART.ils = LINECHART.lineSelect; LINECHART.unselectPaths(); LINECHART.lineSelected()' value='Path" + (index + 1) + "'></input>");
 			startStop = 1;
 			vis.each(Everything);
 			function Everything (){
@@ -1827,38 +1839,38 @@ var LINECHART = (function(){
 					if (fill[ils] == true){
 						lineBegin = d3.svg.area()
 							.x(function(d,i) { return x(sizeOfDomain); })
-							.y0(-1 * y[ils](rangeMin[ils]))
-							.y1(-1 * y[ils](data[ils][sizeOfDomain - 1]))
+							.y0(-1 * y[0](rangeMin[0]))
+							.y1(-1 * y[0](data[ils][sizeOfDomain - 1]))
 						lineBegin2 = d3.svg.area()
 							.x(function(d,i) { return x(i) + w - m - (w - m) / sizeOfDomain; })
-							.y0(-1 * y[ils](rangeMin[ils]))
-							.y1(function(d,i) { return -1 * y[ils](data[ils][sizeOfDomain - 2 + i]); })
+							.y0(-1 * y[0](rangeMin[0]))
+							.y1(function(d,i) { return -1 * y[0](data[ils][sizeOfDomain - 2 + i]); })
 						line = d3.svg.area()
 							.x(function(d,i) { return x(i + 1); })
-							.y0(-1 * y[ils](rangeMin[ils]))
-							.y1(function(d,i) { return -1 * y[ils](data[ils][i]); })
+							.y0(-1 * y[0](rangeMin[0]))
+							.y1(function(d,i) { return -1 * y[0](data[ils][i]); })
 							.interpolate(sharpSmooth[ils]);
 						lineV2 = d3.svg.area()
 							.x(function(d,i) { return x(i); })
-							.y0(-1 * y[ils](rangeMin[ils]))
-							.y1(function(d,i) { return -1 * y[ils](data[ils][i]); })
+							.y0(-1 * y[0](rangeMin[0]))
+							.y1(function(d,i) { return -1 * y[0](data[ils][i]); })
 							.interpolate(sharpSmooth[ils]);
 					}
 					else
 					{
 						lineBegin = d3.svg.area()
 							.x(function(d,i) { return x(sizeOfDomain); })
-							.y(-1 * y[ils](data[ils][sizeOfDomain - 1]))
+							.y(-1 * y[0](data[ils][sizeOfDomain - 1]))
 						lineBegin2 = d3.svg.area()
 							.x(function(d,i) { return x(i) + w - m - (w - m) / sizeOfDomain; })
-							.y(function(d,i) { return -1 * y[ils](data[ils][sizeOfDomain - 2 + i]); })
+							.y(function(d,i) { return -1 * y[0](data[ils][sizeOfDomain - 2 + i]); })
 						line = d3.svg.area()
-							.x(function(d,i) { return x(i + 1); })
-							.y(function(d,i) { return -1 * y[ils](data[ils][i]); })
-							.interpolate(sharpSmooth[ils]);
+						.x(function(d,i) { return x(i + 1); })
+						.y(function(d,i) { return -1 * y[0](data[ils][i]); })
+						.interpolate(sharpSmooth[ils]);
 						lineV2 = d3.svg.area()
 							.x(function(d,i) { return x(i); })
-							.y(function(d,i) { return -1 * y[ils](data[ils][i]); })
+							.y(function(d,i) { return -1 * y[0](data[ils][i]); })
 							.interpolate(sharpSmooth[ils]);
 					}
 					if (transitioning == "all")
@@ -2036,15 +2048,15 @@ var LINECHART = (function(){
 			//Temperatures
 			if (data[ils][Math.floor(i)] > data[ils][Math.floor(i) + 1])
 				displayPoints[ils].push([i * (w - m - (w - m) / (sizeOfDomain-1)) / (sizeOfDomain-1) + m + (w - m) / (sizeOfDomain-1),
-				(-1 * y[ils]((data[ils][Math.floor(i)] - (data[ils][Math.floor(i)] - data[ils][Math.floor(i) + 1]) *
+				(-1 * y[0]((data[ils][Math.floor(i)] - (data[ils][Math.floor(i)] - data[ils][Math.floor(i) + 1]) *
 				(i - Math.floor(i))).toFixed(2))) + h]);
 			if (data[ils][Math.floor(i) + 1] > data[ils][Math.floor(i)])
 				displayPoints[ils].push([i * (w - m - (w - m) / (sizeOfDomain-1)) / (sizeOfDomain-1) + m + (w - m) / (sizeOfDomain-1),
-				(-1 * y[ils]((data[ils][Math.floor(i)] + (data[ils][Math.floor(i)+1] - data[ils][Math.floor(i)]) *
+				(-1 * y[0]((data[ils][Math.floor(i)] + (data[ils][Math.floor(i)+1] - data[ils][Math.floor(i)]) *
 				(i - Math.floor(i))).toFixed(2))) + h]);
 			if (data[ils][Math.floor(i)] == data[ils][Math.floor(i)+1])
 				displayPoints[ils].push([i * (w - m - (w - m) / (sizeOfDomain-1)) / (sizeOfDomain-1) + m + (w - m) / (sizeOfDomain-1),
-				(-1 * y[ils]((data[ils][Math.floor(i)]).toFixed(2))) + h]);
+				(-1 * y[0]((data[ils][Math.floor(i)]).toFixed(2))) + h]);
 			//Times
 			if (data2[ils][Math.floor(i)] > data2[ils][Math.floor(i) + 1])
 			{
@@ -2108,7 +2120,7 @@ var LINECHART = (function(){
 						.enter().append("circle")
 						.attr("r", sizeOfCircles[ils])
 						.attr("cx", function(d,i) { return x(i + 1); })
-						.attr("cy", function(d,i) { return y[ils](rangeMax[ils] + rangeMin[ils] - data[ils][i]); })
+						.attr("cy", function(d,i) { return y[0](rangeMax[0] + rangeMin[0] - data[ils][i]); })
 						.style("stroke", circlesC[ils])
 						.style("fill", circlesC[ils])
 						.each(function(){

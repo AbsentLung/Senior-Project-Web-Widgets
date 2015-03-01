@@ -1,0 +1,14 @@
+External Data:
+	- Temperature (Blue / Yellow / White Gradient)
+	- Light (Black / Yellow Gradient)
+	- Sound (Brown / Pink / Violet / Light Grey Gradient)
+
+Internal Data:
+	- Heart Rate (Red)
+	- Respiratory Rate (Blue)
+
+To do:
+	- Give a different ending string for each path's values (make a "defaults" function?)
+	- Toggle Fahrenheit / Celsius
+	- Try to make compatible with more browsers than chrome
+	- Change a lot of variable names for copyright issues

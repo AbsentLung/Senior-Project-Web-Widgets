@@ -72,6 +72,7 @@
 						<td id="inSharpSmooth"></td>
 						<td id="inFill"></td>
 						<td id="inEstimatedValues"></td>
+						<td id="inFahrCels"></td>
 						<td id="inSelectAll"></td>
 						<td id="theSelectedOption"></td>
 					</tr>
@@ -82,9 +83,7 @@
 			</td>
 		</table></div>
 		<div id="belowChart">
-			<div style="float:left" id="theStart"></div>
-			<div style="float:left" id="theStop"></div>
-			<div style="float:left" id="theReset"></div>
+			<div style="float:left" id="theCSV"></div>
 			<div style="float:left">| Select Line:</div>
 			<div id="theLineButtons"></div>
 			<br>
@@ -107,6 +106,7 @@
 	<script type="text/javascript" src="../lib/socket.io.min.js"></script>
 	<script type="text/javascript" src="../lib/jquery-1.4.2.js"></script>
 	<script type="text/javascript" src="../lib/jquery.flot.js"></script>
+	<script type="text/javascript" src="../lib/jquery.csv.js"></script>
 	<script type="text/javascript" src="lineChart.js"></script>
 	<!--script type="text/javascript" src="lib/mqttws31.js"></script-->
 	<script type="text/javascript">
@@ -122,22 +122,22 @@
 		//X Label, Y Label, Range Minimum, Range Maximum
 		LINECHART.options4("#inXLabel", "#inYLabel", "#inRangeMin", "#inRangeMax");
 		//Toggle Buttons for Plot Circles, Paths, Sharp/Smooth, Fill, Estimated Values, Select All
-		LINECHART.options5("#inCirclesOnOff", "#inPathOnOff", "#inSharpSmooth", "#inFill", "#inEstimatedValues", "#inSelectAll");
+		LINECHART.options5("#inCirclesOnOff", "#inPathOnOff", "#inSharpSmooth", "#inFill", "#inFahrCels", "#inEstimatedValues", "#inSelectAll");
 		//Buttons for start, stop, reset, path select
-		LINECHART.options6("#theStart", "#theStop", "#theReset", "#theLineButtons");
+		LINECHART.options6("#theCSV", "#theLineButtons");
 		//Status, Clicked Status, Selected Option
 		LINECHART.options7("#theStatus", "#theClickedStatus", "#theSelectedOption");
 		/* The "defaults" commands define the line chart's attributes. */
 		//height, width, margin
-		LINECHART.defaults1(500, 1000, 75);
+		LINECHART.defaults1(250, 1500, 50);
 		//X label, Y Label, Axis width, Axis Color, Ticks
 		LINECHART.defaults2("Time (Month/Day/Year Hour:Minute:Second)", "Data", 1, "black", 5);
 		//Domain, Values, Range Minimum [], Range Maximum [], End String []
-		LINECHART.defaults3(15, 1500, [0, 20, 40, 60, 80], [100, 40, 60, 80, 100], ["°C", "lm", "Hz", "bpm", "br/m"]);
+		LINECHART.defaults3(7200, 0, [15, 20, 40, 60, 80], [25, 40, 60, 80, 100], ["°C", "lm", "Hz", "bpm", "br/m"]);
 		//Path width, Path Color, Plot Circle Size, Plot Circle Color
 		LINECHART.defaults4(); //Left blank for defaults
-		//Plot On/Off, Paths On/Off, Sharp/Smooth, Fill On/Off, Estimated in-between Values On/Off, Select All
-		LINECHART.defaults5(false, true, false, false, true, false);
+		//Plot On/Off, Paths On/Off, Sharp/Smooth, Fill On/Off, Fahrenheit/Celsius, Estimated in-between Values On/Off, Select All
+		LINECHART.defaults5(false, true, false, false, false, false, false);
 		//Path Select Text []
 		LINECHART.defaults6(["Room Temperature", "Light", "Sound", "Heart Rate", "Respiratory Rate"]);
 		LINECHART.createLineChart();

@@ -6,6 +6,7 @@ var LINECHART = (function(){
 	var sharpSmooth = new Array();
 	var circlesOnOff = new Array();
 	var pathOnOff = new Array();
+	var fahrCels;
 	var axisC;
 	var axisW;
 	var pathColor;
@@ -23,6 +24,7 @@ var LINECHART = (function(){
 	var pathOnOffDefault;
 	var sharpSmoothDefault;
 	var fillDefault;
+	var fahrCelsDefault;
 	var thisLocalHost;
 	var thisMsgTopic;
 	var mainChartDiv;
@@ -51,6 +53,7 @@ var LINECHART = (function(){
 	var divCirclesOnOff
 	var divSharpSmooth
 	var divFill
+	var divFahrCels
 	var divEstimatedValues
 	var divSelectAll
 	var divStart
@@ -86,6 +89,7 @@ var LINECHART = (function(){
 	yLabel: function(){},
 	yyTicksF: function(){},
 	fillFunction: function(){},
+	fahrCelsFunction: function(){},
 	newDomain: function(){},
 	lineSelected: function(){},
 	resetingEachPath: function(){},
@@ -129,12 +133,13 @@ var LINECHART = (function(){
 		divRangeMin = optionRangeMin
 		divRangeMax = optionRangeMax
 	},
-	options5: function(optionCirclesOnOff, optionPathOnOff, optionSharpSmooth, optionFill, optionEstimatedValues, optionSelectAll)
+	options5: function(optionCirclesOnOff, optionPathOnOff, optionSharpSmooth, optionFill, optionFahrCels, optionEstimatedValues, optionSelectAll)
 	{
 		divPathOnOff = optionPathOnOff
 		divCirclesOnOff = optionCirclesOnOff
 		divSharpSmooth = optionSharpSmooth
 		divFill = optionFill
+		divFahrCels = optionFahrCels
 		divEstimatedValues = optionEstimatedValues
 		divSelectAll = optionSelectAll
 	},
@@ -192,11 +197,12 @@ var LINECHART = (function(){
 		sizeOfCircles = defaultCircleSize;
 		circlesC = defaultCircleColor;
 	},
-	defaults5: function(defaultCircle, defaultPath, defaultSharpSmooth, defaultFill, defaultEstimatedvalues, defaultSelectAll)
+	defaults5: function(defaultCircle, defaultPath, defaultSharpSmooth, defaultFill, defaultFahrCels, defaultEstimatedvalues, defaultSelectAll)
 	{
 		circleOnOffDefault = defaultCircle;
 		pathOnOffDefault = defaultPath;
 		fillDefault = defaultFill;
+		fahrCelsDefault = defaultFahrCels;
 		estimatedValues = defaultEstimatedvalues;
 		selectAllPaths = defaultSelectAll;
 		if (defaultSharpSmooth == true)
@@ -219,6 +225,9 @@ var LINECHART = (function(){
 		thisMsgTopic2 = tmt2;
 	},
 	createLineChart: function(){ //Renders Line Chart
+		//console.log($.getJSON('example2.csv'));
+		//var dataer = $.csv.toArray("example2.csv");
+		//console.log(dataer);
 		var paths = new Array(); //Initialize Variables
 		var paths2 = new Array();
 		var pathsBegin = new Array();
@@ -280,6 +289,7 @@ var LINECHART = (function(){
 		$(divCirclesOnOff).html("<input type='button' onclick='LINECHART.circlesOnOffFunction()' id='butCirclesOnOff'></button>");
 		$(divSharpSmooth).html("<input type='button' onclick='LINECHART.sharpSmoothFunction()' id='butSharpSmooth'></button>");
 		$(divFill).html("<input type='button' onclick='LINECHART.fillFunction()' id='butFill'></button>")
+		$(divFahrCels).html("<input type='button' onclick='LINECHART.fahrCelsFunction()' id='butFahrCels'></button>")
 		$(divEstimatedValues).html("<input type='button' onclick='LINECHART.estimatedValuesFunction()' id='butEstimatedValues'></button>");
 		$(divSelectAll).html("<input type='button' id='butSelectAll'></button>");
 		$(divStart).html("<input type='button' onclick='LINECHART.Start()' id='butStart' value='Start'></input>");
@@ -304,6 +314,10 @@ var LINECHART = (function(){
 			butPathOnOff.value = "Paths Off";
 		else
 			butPathOnOff.value = "Paths";
+		if (fahrCelsDefault == true)
+			butFahrCels.value = "Celsius";
+		else
+			butFahrCels.value = "Fahrenheit";
 		if (fillDefault == true)
 			butFill.value = "Fill Off";
 		else
@@ -1537,6 +1551,16 @@ var LINECHART = (function(){
 				assignPaths();
 				createPaths();
 				transitioning = "true";
+			}
+		}
+		LINECHART.fahrCelsFunction = function() {
+			if (fahrCels == true) {
+				fahrCels = false
+				butFahrCels.value = "Celsius";
+			}
+			else {
+				fahrCels = true
+				butFahrCels.value = "fahrenheit";
 			}
 		}
 		//Changing the Domain Size

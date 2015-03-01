@@ -91,7 +91,7 @@
 			<div id="theStatus"></div>
 			<div style="float:left" >At Click:</div>
 			<div id="theClickedStatus"></div>
-			<!--table>
+			<table>
 				<tr>
 					<td>Return CPU: </td>
 					<td id="returnCPU"></td>
@@ -100,13 +100,13 @@
 					<td>Return temp: </td>
 					<td id="returntemp"></td>
 				</tr>
-			</table-->
+			</table>
 		</div>
 	</div>
-	<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
-	<script type="text/javascript" src="../lib/socket.io.min.js"></script>
-	<script type="text/javascript" src="../lib/jquery-1.4.2.js"></script>
-	<script type="text/javascript" src="../lib/jquery.flot.js"></script>
+	<script type="text/javascript" src="lib/d3.v3.min.js"></script>
+	<script type="text/javascript" src="lib/socket.io.min.js"></script>
+	<script type="text/javascript" src="lib/jquery-1.4.2.js"></script>
+	<script type="text/javascript" src="lib/jquery.flot.js"></script>
 	<script type="text/javascript" src="lineChart.js"></script>
 	<!--script type="text/javascript" src="lib/mqttws31.js"></script-->
 	<script type="text/javascript">
@@ -132,8 +132,8 @@
 		LINECHART.defaults1(500, 1000, 75);
 		//X label, Y Label, Axis width, Axis Color, Ticks
 		LINECHART.defaults2("Time (Month/Day/Year Hour:Minute:Second)", "Data", 1, "black", 5);
-		//Domain, Values, Range Minimum [], Range Maximum [], End String []
-		LINECHART.defaults3(15, 1500, [0, 20, 40, 60, 80], [100, 40, 60, 80, 100], ["°C", "lm", "Hz", "bpm", "br/m"]);
+		//Domain, Values, Range Minimum [], Range Maximum []
+		LINECHART.defaults3(15, 1500, [0, 20, 40, 60, 80], [100, 40, 60, 80, 100], ["°", "lm", "Hz", "bpm", "br/m"]);
 		//Path width, Path Color, Plot Circle Size, Plot Circle Color
 		LINECHART.defaults4(); //Left blank for defaults
 		//Plot On/Off, Paths On/Off, Sharp/Smooth, Fill On/Off, Estimated in-between Values On/Off, Select All

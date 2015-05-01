@@ -1,12 +1,10 @@
 var LINECHART = (function(){
 	var sizeOfDomain; //Declare Variables
 	var values;
-	var estimatedValues;
 	var fill = new Array();
 	var sharpSmooth = new Array();
 	var circlesOnOff = new Array();
 	var pathOnOff = new Array();
-	var fahrCels;
 	var axisC;
 	var axisW;
 	var pathColor;
@@ -24,7 +22,6 @@ var LINECHART = (function(){
 	var pathOnOffDefault;
 	var sharpSmoothDefault;
 	var fillDefault;
-	var fahrCelsDefault;
 	var thisLocalHost;
 	var thisMsgTopic;
 	var mainChartDiv;
@@ -53,8 +50,6 @@ var LINECHART = (function(){
 	var divCirclesOnOff
 	var divSharpSmooth
 	var divFill
-	var divFahrCels
-	var divEstimatedValues
 	var divSelectAll
 	var divCSV
 	var divLineButtons
@@ -71,7 +66,6 @@ var LINECHART = (function(){
 	createUserInterface: function(){}, //Declare Functions
 	domainSize: function(){},
 	valuesFunction: function(){},
-	estimatedValuesFunction: function(){},
 	sharpSmoothFunction: function(){},
 	circlesOnOffFunction: function(){},
 	pathOnOffFunction: function(){},
@@ -88,7 +82,6 @@ var LINECHART = (function(){
 	yLabel: function(){},
 	yyTicksF: function(){},
 	fillFunction: function(){},
-	fahrCelsFunction: function(){},
 	newDomain: function(){},
 	lineSelected: function(){},
 	Start: function(){},
@@ -129,14 +122,12 @@ var LINECHART = (function(){
 		divRangeMin = optionRangeMin
 		divRangeMax = optionRangeMax
 	},
-	options5: function(optionCirclesOnOff, optionPathOnOff, optionSharpSmooth, optionFill, optionFahrCels, optionEstimatedValues, optionSelectAll)
+	options5: function(optionCirclesOnOff, optionPathOnOff, optionSharpSmooth, optionFill, optionSelectAll)
 	{
 		divPathOnOff = optionPathOnOff
 		divCirclesOnOff = optionCirclesOnOff
 		divSharpSmooth = optionSharpSmooth
 		divFill = optionFill
-		divFahrCels = optionFahrCels
-		divEstimatedValues = optionEstimatedValues
 		divSelectAll = optionSelectAll
 	},
 	options6: function(thisCSV, thisLineButtons)
@@ -191,13 +182,11 @@ var LINECHART = (function(){
 		sizeOfCircles = defaultCircleSize;
 		circlesC = defaultCircleColor;
 	},
-	defaults5: function(defaultCircle, defaultPath, defaultSharpSmooth, defaultFill, defaultFahrCels, defaultEstimatedvalues, defaultSelectAll)
+	defaults5: function(defaultCircle, defaultPath, defaultSharpSmooth, defaultFill, defaultSelectAll)
 	{
 		circleOnOffDefault = defaultCircle;
 		pathOnOffDefault = defaultPath;
 		fillDefault = defaultFill;
-		fahrCelsDefault = defaultFahrCels;
-		estimatedValues = defaultEstimatedvalues;
 		selectAllPaths = defaultSelectAll;
 		if (defaultSharpSmooth == true)
 			sharpSmoothDefault = "linear";
@@ -220,8 +209,6 @@ var LINECHART = (function(){
 	},
 	createLineChart: function(){ //Renders Line Chart
 		var paths = new Array(); //Initialize Variables
-		var paths2 = new Array();
-		var pathsBegin = new Array();
 		var circles = new Array();
 		var displayPoints = new Array();
 		var timeAtPoint = new Array();
@@ -258,7 +245,6 @@ var LINECHART = (function(){
 		function createPaths(){};
 		function appendCircles(){};
 		function userInterface(){};
-		function pointsInBetweenPoints(){};
 		$(divDomain).html("<input type='text' onkeypress='LINECHART.domainSize(event)' id='butDomain'></text>"); //Append Options
 		$(divCircleColor).html("<input type='text' onkeypress='LINECHART.circleColor(event)' id='butCircleColor'></text>");
 		$(divCircleSize).html("<input type='text' onkeypress='LINECHART.circleSize(event)' id='butCircleSize'></text>");
@@ -279,10 +265,8 @@ var LINECHART = (function(){
 		$(divCirclesOnOff).html("<input type='button' onclick='LINECHART.circlesOnOffFunction()' id='butCirclesOnOff'></button>");
 		$(divSharpSmooth).html("<input type='button' onclick='LINECHART.sharpSmoothFunction()' id='butSharpSmooth'></button>");
 		$(divFill).html("<input type='button' onclick='LINECHART.fillFunction()' id='butFill'></button>")
-		$(divFahrCels).html("<input type='button' onclick='LINECHART.fahrCelsFunction()' id='butFahrCels'></button>")
-		$(divEstimatedValues).html("<input type='button' onclick='LINECHART.estimatedValuesFunction()' id='butEstimatedValues'></button>");
 		$(divSelectAll).html("<input type='button' id='butSelectAll'></button>");
-		$(divCSV).html("<input type='file' onclick='LINECHART.Start();' id='butCSV' value='Browse CSV'></input>");
+		$(divCSV).html("<input type='file' id='butCSV' value='Browse CSV'></input>");
 		$(divLineButtons).html("<span id='lineButtons'></span>");
 		$(divSelectedOption).html("<span id='selectedOption'></span>");
 		$(divStatus).html("<span id='status'></span>");
@@ -302,29 +286,48 @@ var LINECHART = (function(){
 			butPathOnOff.value = "Paths Off";
 		else
 			butPathOnOff.value = "Paths";
-		if (fahrCelsDefault == true)
-			butFahrCels.value = "Celsius";
-		else
-			butFahrCels.value = "Fahrenheit";
 		if (fillDefault == true)
 			butFill.value = "Fill Off";
 		else
 			butFill.value = "Fill";
-		if (estimatedValues == true)
-			butEstimatedValues.value = "Real Values";
-		else
-			butEstimatedValues.value = "Estimated Values";
+		var firstFile = true;
 		var count = 0;
 		numberOfPaths = 5;
-		function generateData(){
-			for (var i = 0; i < CSVContents.length; i++)
+		function generateData() {
+			for (var i = 0; i < CSVContents[0].length-1; i++)
+			{
+				data[i] = []
+				oldData[i] = []
+				for (var j = 0; j < sizeOfDomain; j++)
+				{
+					oldData[i][j] = rangeMin[i];
+					data[i][j] = rangeMin[i];
+				}
+				if (firstFile) {
+					paths[i] = linesPath
+						.data([0])
+						.enter().insert("path");
+					circles[i] = axisCircles
+						.data([0])
+						.enter().append("circle");
+					if (i==4)
+						firstFile = false;
+				}
+				else {
+					assignPaths();
+				}
+				data2[i] = []
+				for (var j = 0; j < sizeOfDomain; j++)
+					data2[i][j] = rangeMin[j];
+			}
+			for (var i = 0; i < CSVContents.length-1; i++)
 			{
 				var s = CSVContents[i][0];
 				s = "20" + s.substring(0, 2) + '-' + s.substring(2, 4) + '-' + s.substring(4, 6) + 'T' + s.substring(6, 8) + ':' + s.substring(8, 10) + ':' + s.substring(10, 12);
-				timeIn=new Date(s);
 				for (var j = 1; j < CSVContents[0].length; j++) {
-			//		newDataIn[i-1] = true;
-					eachPathData[j-1] = 100 * CSVContents[i][j];
+					data[j-1][i] = CSVContents[i][j];
+					data2[j-1][i] = new Date(s);
+					eachPathData[j-1] = data[j-1][i];
 				}
 			}
 			for (var i = 1; i < CSVContents[0].length; i++)
@@ -340,9 +343,10 @@ var LINECHART = (function(){
 							CSVContents = e.target.result;
 							CSVContents = CSVContents.split('\n')
 							for (var i = 0; i < CSVContents.length; i++) {
-								CSVContents[i] = CSVContents[i].split('\t');
+								CSVContents[i] = CSVContents[i].split(',');
 							}
 							generateData();
+							LINECHART.Start();
 						};
 					})(f);
 					r.readAsText(f);
@@ -807,42 +811,26 @@ var LINECHART = (function(){
 					YpageY = 100 - (ePageY - m - 89)  / (h-m*2) * (values/sizeOfDomain);
 					pageYFixed = YpageY.toFixed(Math.floor(values/sizeOfDomain/10).toString().length);
 					pageXFixed = XpageX.toFixed(Math.floor(values/sizeOfDomain/10).toString().length);
-					if (displayPoints[lineSelect][(pageXFixed - 1)*(values/sizeOfDomain)] != null
-						&& timeAtPoint[lineSelect][(pageXFixed - 2) * (values/sizeOfDomain)] != null)
-					{
-						if (estimatedValues == false)
-						{
-							if (isNaN(data2Times[lineSelect]) == true) {
-								data2Times[lineSelect] = []
-							}
-							for (var i = 0; i <= sizeOfDomain; i++) {
-								data2Times[lineSelect][i] = new Date(data2[lineSelect][i]);
-							}
-							inputTextY = ( ( ((y[lineSelect](data[lineSelect][Math.round(XpageX - 1)]) - m - 89)  / (h-m*2) * (100)) 
-								+ (25.42857142857143*(350/(h-m*2)))) * (rangeMax[lineSelect] - rangeMin[lineSelect]) / 100
-								+ rangeMin[lineSelect] ).toFixed(2);
-							$('#status').html( data2Times[lineSelect][Math.round(XpageX) - 1].toTimeString()
-								+', '+ inputTextY + endString[lineSelect]);
-							focus.attr("transform", "translate(" + (Math.round(XpageX) * ((w - m)/sizeOfDomain) + m)
-								+ "," + y[lineSelect]((rangeMax[lineSelect] - data[lineSelect][Math.round(XpageX) - 1])
-								+ rangeMin[lineSelect])  + ")");
-							focus.select("text").text( data2Times[lineSelect][Math.round(XpageX) - 1].toTimeString().substring(0, 8)
-								+', '+ inputTextY + endString[lineSelect]).attr("transform", "translate(10, 10)");
-						}
-						else
-						{
-							inputTextY = ((100 - 25.42857142857143*(350/(h-m*2))
-								- (displayPoints[lineSelect][(pageXFixed - 1)*(values/sizeOfDomain)][1] - m - 89)
-								/ (h-m*2) * (100)) * (rangeMax[lineSelect] - rangeMin[lineSelect]) / 100 + rangeMin[lineSelect] ).toFixed(2);
-							$('#status').html(timeAtPoint[lineSelect][(pageXFixed - 2)*(values/sizeOfDomain)].toTimeString()
-								+', '+ inputTextY + endString[lineSelect]);
-							focus.attr("transform", "translate(" + (ePageX - 7)+ ","
-								+ displayPoints[lineSelect][(values/sizeOfDomain)* (pageXFixed - 1)][1] + ")");
-							focus.select("text").text( timeAtPoint[lineSelect][(pageXFixed - 1)
-								* (values/sizeOfDomain)].toTimeString().substring(0, 8) +', '
-								+ inputTextY + endString[lineSelect]).attr("transform", "translate(10, 10)");
-						}
+					//if (displayPoints[lineSelect][(pageXFixed - 1)*(values/sizeOfDomain)] != null
+					//	&& timeAtPoint[lineSelect][(pageXFixed - 2) * (values/sizeOfDomain)] != null)
+					//{
+					if (isNaN(data2Times[lineSelect]) == true) {
+						data2Times[lineSelect] = []
 					}
+					for (var i = 0; i <= sizeOfDomain; i++) {
+						data2Times[lineSelect][i] = new Date(data2[lineSelect][i]);
+					}
+					inputTextY = ( ( ((y[lineSelect](data[lineSelect][Math.round(XpageX)]) - m - 89)  / (h-m*2) * (100))
+						+ (25.42857142857143*(350/(h-m*2)))) * (rangeMax[lineSelect] - rangeMin[lineSelect]) / 100
+						+ rangeMin[lineSelect] ).toFixed(2);
+					$('#status').html( data2Times[lineSelect][Math.round(XpageX)].toTimeString()
+						+', '+ inputTextY + endString[lineSelect]);
+					focus.attr("transform", "translate(" + (Math.round(XpageX) * ((w - m)/sizeOfDomain) + m)
+						+ "," + y[lineSelect]((rangeMax[lineSelect] - data[lineSelect][Math.round(XpageX)])
+						+ rangeMin[lineSelect])  + ")");
+					focus.select("text").text( data2Times[lineSelect][Math.round(XpageX)].toTimeString().substring(0, 8)
+						+', '+ inputTextY + endString[lineSelect]).attr("transform", "translate(10, 10)");
+					//}
 				}
 				else
 				{
@@ -854,23 +842,11 @@ var LINECHART = (function(){
 				if (selectAllPaths == false)
 				{
 					focus.style("display", null);
-					if (estimatedValues == false)
-					{
-						if (data2Times[lineSelect][Math.round(XpageX)] != null && inputTextY != null)
-							$('#clickedStatus').html( data2Times[lineSelect][Math.round(XpageX) - 1]
-								+ ", " + inputTextY + endString[lineSelect]);
-						else
-							$('#clickedStatus').html("Error.. Try again");
-					}
+					if (data2Times[lineSelect][Math.round(XpageX)] != null && inputTextY != null)
+						$('#clickedStatus').html( data2Times[lineSelect][Math.round(XpageX)]
+							+ ", " + inputTextY + endString[lineSelect]);
 					else
-					{
-						if (displayPoints[lineSelect][(pageXFixed - 2)*(values/sizeOfDomain)] != null
-							&& timeAtPoint[lineSelect][(pageXFixed - 2) * (values/sizeOfDomain)] != null)
-							$('#clickedStatus').html( timeAtPoint[lineSelect][(pageXFixed - 1)*(values/sizeOfDomain)]
-								+ ", " + inputTextY + endString[lineSelect]);
-							else
-								$('#clickedStatus').html("There was an error. Please try again");
-					}
+						$('#clickedStatus').html("Error.. Try again");
 				}
 				else
 				{
@@ -892,7 +868,6 @@ var LINECHART = (function(){
 					eachPathData.forEach(LINECHART.newDomain);
 					transitioning = "all";
 					createPaths();
-					pointsInBetweenPoints();
 					appendCircles();
 					transitioning = "true";
 				}
@@ -909,7 +884,6 @@ var LINECHART = (function(){
 				values = parseInt(butValues.value);
 				$('#selectedOption').html( "Number of Values: " + values);
 				transitioning = "all";
-				pointsInBetweenPoints();
 				axisCircles.remove();
 				appendCircles();
 				transitioning = "true";
@@ -919,24 +893,6 @@ var LINECHART = (function(){
 		}
 		else
 			$('#selectedOption').html( "Number of Values: ");
-		}
-		LINECHART.estimatedValuesFunction = function(){
-			if (estimatedValues == true)
-			{
-				estimatedValues = false;
-				butEstimatedValues.value = "Estimated Values";
-			}
-			else
-			{
-				estimatedValues = true;
-				butEstimatedValues.value = "Real Values";
-				transitioning = "all";
-				pointsInBetweenPoints();
-				transitioning = "true";
-			}
-			transitioning = "all";
-			appendCircles();
-			transitioning = "true";
 		}
 		LINECHART.sharpSmoothFunction = function() {
 			if (selectAllPaths == true)
@@ -1021,12 +977,6 @@ var LINECHART = (function(){
 					butPathOnOff.value = "Path Off";
 				}
 				paths[ils]
-					.style("fill-opacity", slidePathVisibility[ils]/100)
-					.style("opacity", slidePathVisibility[ils])
-				paths2[ils]
-					.style("fill-opacity", slidePathVisibility[ils]/100)
-					.style("opacity", slidePathVisibility[ils])
-				pathsBegin[ils]
 					.style("fill-opacity", slidePathVisibility[ils]/100)
 					.style("opacity", slidePathVisibility[ils])
 			}
@@ -1145,8 +1095,6 @@ var LINECHART = (function(){
 						pathColor[ils] = "url(#tempGradient)"
 						$('#selectedOption').html( "Path Color: default");
 						paths[ils].transition().duration(500).style("stroke", pathColor[ils]).style("fill", pathColor[ils])
-						paths2[ils].transition().duration(500).style("stroke", pathColor[ils]).style("fill", pathColor[ils])
-						pathsBegin[ils].transition().duration(500).style("stroke", pathColor[ils]).style("fill", pathColor[ils])
 					}
 					else {
 						if (/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test("#" + butPathC.value) == true)
@@ -1154,8 +1102,6 @@ var LINECHART = (function(){
 							pathColor[ils] = "#" + butPathC.value
 							$('#selectedOption').html( "Path Color: " + pathColor[ils]);
 							paths[ils].transition().duration(500).style("stroke", pathColor[ils]).style("fill", pathColor[ils])
-							paths2[ils].transition().duration(500).style("stroke", pathColor[ils]).style("fill", pathColor[ils])
-							pathsBegin[ils].transition().duration(500).style("stroke", pathColor[ils]).style("fill", pathColor[ils])
 						}
 						else
 							$('#selectedOption').html( "Path Color: must be a valid color");
@@ -1182,8 +1128,6 @@ var LINECHART = (function(){
 						pathWidth[ils] = parseFloat(butPathW.value);
 						$('#selectedOption').html( "Path Width: " + pathWidth[ils]);
 						paths[ils].transition().duration(500).style("stroke-width", pathWidth[ils])
-						paths2[ils].transition().duration(500).style("stroke-width", pathWidth[ils])
-						pathsBegin[ils].transition().duration(500).style("stroke-width", pathWidth[ils])
 					}
 					else
 					$('#selectedOption').html( "Path Width: must be a valid number");
@@ -1392,10 +1336,7 @@ var LINECHART = (function(){
 					assignPaths();
 					appendCircles();
 					paths[lineSelect].transition().duration(500).attr("d", line)
-					paths2[lineSelect].transition().duration(500).attr("d", line)
-					pathsBegin[lineSelect].transition().duration(500).attr("d", lineBegin)
 					transitioning = "all";
-					pointsInBetweenPoints();
 				}
 				else
 					$('#selectedOption').html( "Range Minimum: must be a valid number lower than the range maximum");
@@ -1425,10 +1366,7 @@ var LINECHART = (function(){
 					assignPaths();
 					appendCircles();
 					paths[lineSelect].transition().duration(500).attr("d", line)
-					paths2[lineSelect].transition().duration(500).attr("d", line)
-					pathsBegin[lineSelect].transition().duration(500).attr("d", lineBegin)
 					transitioning = "all";
-					pointsInBetweenPoints();
 				}
 				else
 					$('#selectedOption').html( "Range Maximum: must be a valid number higher than the range minimum");
@@ -1508,16 +1446,6 @@ var LINECHART = (function(){
 				transitioning = "true";
 			}
 		}
-		LINECHART.fahrCelsFunction = function() {
-			if (fahrCels == true) {
-				fahrCels = false
-				butFahrCels.value = "Celsius";
-			}
-			else {
-				fahrCels = true
-				butFahrCels.value = "fahrenheit";
-			}
-		}
 		//Changing the Domain Size
 		LINECHART.newDomain = function(element, index, array){
 			oldData[index] = data[index]
@@ -1581,12 +1509,6 @@ var LINECHART = (function(){
 			paths[ils]
 				.transition().duration(200).style("stroke", "red").style("stroke-width", pathWidth[ils]*1.5)
 				.transition().duration(200).style("stroke", pathColor[ils]).style("stroke-width", pathWidth[ils]);
-			paths2[ils]
-				.transition().duration(200).style("stroke", "red").style("stroke-width", pathWidth[ils]*1.5)
-				.transition().duration(200).style("stroke", pathColor[ils]).style("stroke-width", pathWidth[ils]);
-			pathsBegin[ils]
-				.transition().duration(200).style("stroke", "red").style("stroke-width", pathWidth[ils]*1.5)
-				.transition().duration(200).style("stroke", pathColor[ils]).style("stroke-width", pathWidth[ils]);
 			circles[ils]
 				.transition().duration(200).style("stroke", "red").style("fill", "red").attr("r", sizeOfCircles[ils]*2)
 				.transition().duration(200).style("stroke", circlesC[ils]).style("fill", circlesC[ils]).attr("r", sizeOfCircles[ils])
@@ -1605,28 +1527,12 @@ var LINECHART = (function(){
 				.attr("x1", x(0))
 				.attr("x2", x(sizeOfDomain))
 				.remove();
-/*			lineChart.append("text")
-				.attr("x", x(5))
-				.attr("y", -1 * y[0]((rangeMax[0] - rangeMin[0]) / 2 + rangeMin[0]))
-				.transition()
-				.delay(1000)
-				.text("No information is currently being read in,"
-				+ " graph will transition when information is read in")
-*/			var renderGraph = false;
-			setInterval(function()
+			if (isNaN(newDataIn[0]) == false)
 			{
-				if (renderGraph == false) {
-					if (isNaN(newDataIn[0]) == false)
-					{
-						$('#lineButtons').html("")
-						startMain();
-						renderGraph = true;
-					}
-				}
-				else {
-					return;
-				}
-			},0);
+				$('#lineButtons').html("")
+				startMain();
+				renderGraph = true;
+			}
 		}
 		//Graph-Rendering Function
 		function startMain()
@@ -1652,40 +1558,11 @@ var LINECHART = (function(){
 			circlesOnOff[index] = circleOnOffDefault;
 			sharpSmooth[index] = sharpSmoothDefault;
 			fill[index] = fillDefault;
-			if(data[index] == null){
-				data[index] = []
-				oldData[index] = []
-				for (var i = 0; i < sizeOfDomain; i++)
-				{
-					oldData[index][i] = rangeMin[index];
-					data[index][i] = rangeMin[index];
-				}
-				paths[index] = linesPath
-					.data([0])
-					.enter().insert("path");
-				paths2[index] = linesPath2
-					.data([0])
-					.enter().insert("path");
-				pathsBegin[index] = linesPathBegin
-					.data([0])
-					.enter().insert("path");
-				circles[index] = axisCircles
-					.data([0])
-					.enter().append("circle");
-			}
-			if(data2[index] == null){
-				data2[index] = []
-				for (var i = 0; i < sizeOfDomain; i++)
-					data2[index][i] = rangeMin[index];
-			}
 			if(pathWidth[index] == null){
 				pathWidth[index] = 2;
 			}
 			if(sizeOfCircles[index] == null){
 				sizeOfCircles[index] = 2;
-			}
-			if(circlesC[index] == null){
-				circlesC[index] = "black";
 			}
 			if(pathOnOff[index] == null){
 				pathOnOff[index] = true;
@@ -1702,6 +1579,23 @@ var LINECHART = (function(){
 			if(slidePathVisibility[index] == null){
 				slidePathVisibility[index] = 75;
 			}
+			if(circlesC[index] == null){
+                if(index == 0){
+                    circlesC[index] = 'url(#tempGradient)';
+                }
+                else if(index == 1){
+                    circlesC[index] = 'url(#lightGradient)';
+                }
+                else if(index == 2){
+                    circlesC[index] = 'url(#soundGradient)';
+                }
+                else if(index == 3){
+                    circlesC[index] = 'Red';
+                }
+                else if(index == 4){
+                    circlesC[index] = 'Blue';
+                }
+            }
 			if(pathColor[index] == null){
 				if(index == 0){
 					pathColor[index] = 'url(#tempGradient)';
@@ -1803,8 +1697,6 @@ var LINECHART = (function(){
 					if (transitioning == "all")
 					{
 						paths[all].transition().duration(500).attr("d", line)
-						paths2[all].transition().duration(500).attr("d", line)
-						pathsBegin[all].transition().duration(500).attr("d", lineBegin)
 					}
 				}
 			}
@@ -1826,8 +1718,7 @@ var LINECHART = (function(){
 				if (transitioning == "all")
 					ils = all;
 				paths[ils].remove();
-				paths2[ils].remove();
-				pathsBegin[ils].remove();
+console.log("yea0");
 				paths[ils] = linesPath
 					.data([0])
 					.enter().insert("path")
@@ -1840,30 +1731,7 @@ var LINECHART = (function(){
 					.style("fill-opacity", slidePathVisibility[ils]/100)
 					.style("opacity", slidePathVisibility[ils])
 					.each(slidePath);
-				paths2[ils] = linesPath2
-					.data([0])
-					.enter().insert("path")
-					.datum(data[ils])
-					.attr("class", "line")
-					.attr("d", line)
-					.style("stroke",pathColor[ils])
-					.style("stroke-width",pathWidth[ils])
-					.style("fill", pathColor[ils])
-					.style("fill-opacity", slidePathVisibility[ils]/100)
-					.style("opacity", slidePathVisibility[ils])
-					.each(waitPath);
-				pathsBegin[ils] = linesPathBegin
-					.data([0])
-					.enter().insert("path")
-					.datum([0, 0])
-					.attr("class", "line")
-					.attr("d", lineBegin)
-					.style("stroke",pathColor[ils])
-					.style("stroke-width",pathWidth[ils])
-					.style("fill", pathColor[ils])
-					.style("fill-opacity", slidePathVisibility[ils]/100)
-					.style("opacity", slidePathVisibility[ils])
-					.each(slidePathBegin);
+console.log("yea4");
 				}
 			}
 			createPaths();
@@ -1876,49 +1744,17 @@ var LINECHART = (function(){
 			butSharpSmooth.disabled = false;
 			butFill.disabled = false;
 			butSelectAll.disabled = false;
-			function slidePathBegin() { //Path Motion Functions
-				if (transitioning == "true")
-				{
-					var scrollingPath = d3.select(this);
-					scrollingPath = scrollingPath
-						.transition()
-						.duration(timetocompleteoneshift[index] / 8)
-					scrollingPath = scrollingPath
-						.transition()
-						.duration(timetocompleteoneshift[index] / 8)
-						.attr("d", lineBegin2)
-					scrollingPath = scrollingPath
-						.transition()
-						.duration(timetocompleteoneshift[index] / 4)
-					scrollingPath = scrollingPath
-						.transition()
-						.duration(timetocompleteoneshift[index] / 8)
-					scrollingPath = scrollingPath
-						.transition()
-						.duration(timetocompleteoneshift[index] / 8)
-					scrollingPath = scrollingPath
-						.transition()
-						.duration(timetocompleteoneshift[index] / 8)
-					scrollingPath = scrollingPath
-						.transition()
-						.duration(timetocompleteoneshift[index] / 8)
-				}
-			}
-			function slidePath() { //Path visible during animation
+			function slidePath() {
 				if (transitioning == "true")
 				{
 					var scrollingPath = d3.select(this);
 					scrollingPath = scrollingPath.transition()
 						.duration(timetocompleteoneshift[index] / 32)
-						.style("opacity", 0)
-						.style("fill-opacity", 0)
 					scrollingPath = scrollingPath.transition()
 						.duration(timetocompleteoneshift[index] / 32)
 						.attr("d", line)
 					scrollingPath = scrollingPath.transition()
 						.duration(timetocompleteoneshift[index] / 16)
-						.style("opacity", slidePathVisibility[index])
-						.style("fill-opacity", slidePathVisibility[index]/100)
 					scrollingPath = scrollingPath.transition()
 						.duration(timetocompleteoneshift[index] / 8)
 						.attr("d", lineV2)
@@ -1926,83 +1762,6 @@ var LINECHART = (function(){
 						.duration(timetocompleteoneshift[index] * 3 / 4)
 				}
 			}
-			function waitPath() { //Path visible while moving path is hidden
-				if (transitioning == "true")
-				{
-					var scrollingPath = d3.select(this);
-					scrollingPath = scrollingPath.transition()
-						.duration(timetocompleteoneshift[index] / 8)
-						.style("opacity", slidePathVisibility[index])
-						.style("fill-opacity", slidePathVisibility[index]/100)
-					scrollingPath = scrollingPath.transition()
-						.duration(timetocompleteoneshift[index] / 8)
-						.style("opacity", 0)
-						.style("fill-opacity", 0)
-					scrollingPath = scrollingPath.transition()
-						.duration(timetocompleteoneshift[index] / 4)
-						.attr("d", lineV2)
-					scrollingPath = scrollingPath.transition()
-						.duration(timetocompleteoneshift[index] * 3 / 8)
-					scrollingPath = scrollingPath.transition()
-						.duration(timetocompleteoneshift[index] / 8)
-					data[index].shift();//Shift Data
-					data2[index].shift();
-					data[index][sizeOfDomain - 1] = eachPathData[index];
-					data2[index][sizeOfDomain - 1 ] = d[index];
-					//console.log(data[index]);
-					//console.log(index);
-				}
-			}
-			if (estimatedValues == true) //Points in between points
-				pointsInBetweenPoints();
-			pointsInBetweenPoints = function(){
-			if (transitioning == "true")
-			{
-				ils = index;
-				assignAllPoints();
-			}
-			if (transitioning == "all")
-				eachPathData.forEach(assignAllPoints);
-			function assignAllPoints(element2, all, array2){
-			if (transitioning == "all")
-				ils = all;
-			timeAtPoint[ils] = [];
-			displayPoints[ils] = [];
-			for (var i = 0; i <= (sizeOfDomain); i += (sizeOfDomain/values)) {
-			//Temperatures
-			if (data[ils][Math.floor(i)] > data[ils][Math.floor(i) + 1])
-				displayPoints[ils].push([i * (w - m - (w - m) / (sizeOfDomain-1)) / (sizeOfDomain-1) + m + (w - m) / (sizeOfDomain-1),
-				(-1 * y[ils]((data[ils][Math.floor(i)] - (data[ils][Math.floor(i)] - data[ils][Math.floor(i) + 1]) *
-				(i - Math.floor(i))).toFixed(2))) + h]);
-			if (data[ils][Math.floor(i) + 1] > data[ils][Math.floor(i)])
-				displayPoints[ils].push([i * (w - m - (w - m) / (sizeOfDomain-1)) / (sizeOfDomain-1) + m + (w - m) / (sizeOfDomain-1),
-				(-1 * y[ils]((data[ils][Math.floor(i)] + (data[ils][Math.floor(i)+1] - data[ils][Math.floor(i)]) *
-				(i - Math.floor(i))).toFixed(2))) + h]);
-			if (data[ils][Math.floor(i)] == data[ils][Math.floor(i)+1])
-				displayPoints[ils].push([i * (w - m - (w - m) / (sizeOfDomain-1)) / (sizeOfDomain-1) + m + (w - m) / (sizeOfDomain-1),
-				(-1 * y[ils]((data[ils][Math.floor(i)]).toFixed(2))) + h]);
-			//Times
-			if (data2[ils][Math.floor(i)] > data2[ils][Math.floor(i) + 1])
-			{
-				var zeNewDate = new Date(Math.round([(data2[ils][Math.floor(i)] - (data2[ils][Math.floor(i)] - data2[ils][Math.floor(i) + 1]) *  (i - Math.floor(i))) + h]))
-				timeAtPoint[ils].push(zeNewDate)
-			};
-
-			if (data2[ils][Math.floor(i) + 1] > data2[ils][Math.floor(i)])
-			{
-				var zeNewDate = new Date(Math.round([(data2[ils][Math.floor(i)] + (data2[ils][Math.floor(i)+1] - data2[ils][Math.floor(i)]) *  (i - Math.floor(i))) + h]))
-				timeAtPoint[ils].push(zeNewDate)
-			};
-
-			if (data2[ils][Math.floor(i)] == data2[ils][Math.floor(i)+1])
-			{
-				var zeNewDate = new Date(Math.round([(data2[ils][Math.floor(i)]) + h]))
-				timeAtPoint[ils].push(zeNewDate)
-			};
-			}
-			}
-			}
-			pointsInBetweenPoints();
 			appendCircles = function() {
 			if (transitioning == "true")
 			{
@@ -2021,24 +1780,6 @@ var LINECHART = (function(){
 				ils = all;
 			circles[ils].remove();
 			if (circlesOnOff[ils] == true){
-				if (estimatedValues == true)
-				{
-					circles[ils] = axisCircles
-						.data(displayPoints[ils])
-						.enter().append("circle")
-						.attr("r", sizeOfCircles[ils])
-						.attr("cx", function(d,i) { return displayPoints[ils][i][0]; })
-						.attr("cy", function(d,i) { return displayPoints[ils][i][1]; })
-						.style("stroke", circlesC[ils])
-						.style("fill", circlesC[ils])
-						.each(function(){
-							var theseCircles = d3.select(this);
-							theseCircles = theseCircles.transition().duration(timetocompleteoneshift[ils]/2);
-							theseCircles = theseCircles.transition().duration(timetocompleteoneshift[ils]/2);
-						});
-				}
-				else
-				{
 					circles[ils] = axisCircles
 						.data(data[ils])
 						.enter().append("circle")
@@ -2052,7 +1793,6 @@ var LINECHART = (function(){
 							theseCircles = theseCircles.transition().duration(timetocompleteoneshift[ils]/2);
 							theseCircles = theseCircles.transition().duration(timetocompleteoneshift[ils]/2);
 						});
-				}
 			}
 			}
 			}

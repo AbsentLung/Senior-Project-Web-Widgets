@@ -354,31 +354,31 @@ var LINECHART = (function(){
 		setInterval(function()
 		{
 			newDataIn[0] = true;
-			eachPathData[0] = 100 * Math.random();
+			eachPathData[0] = 6 * Math.random() + 22;
 			timeIn=new Date().getTime();
 		}, 700);
 		setInterval(function()
 		{
 			newDataIn[1] = true;
-			eachPathData[1] = 20 * Math.random() + 20;
+			eachPathData[1] = 40 * Math.random() + 300;
 			timeIn=new Date().getTime();
 		}, 500);
 		setInterval(function()
 		{
 			newDataIn[2] = true;
-			eachPathData[2] = 20 * Math.random() + 40;
+			eachPathData[2] = 8 * Math.random() + 27;
 			timeIn=new Date().getTime();
 		}, 1500);
 		setInterval(function()
 		{
 			newDataIn[3] = true;
-			eachPathData[3] = 20 * Math.random() + 60;
+			eachPathData[3] = 2 * Math.random() + 60;
 			timeIn=new Date().getTime();
 		}, 275);
 		setInterval(function()
 		{
 			newDataIn[4] = true;
-			eachPathData[4] = 20 * Math.random() + 80;
+			eachPathData[4] = 2 * Math.random() + 22;
 			timeIn=new Date().getTime();
 		}, 800);
 		 
@@ -1740,9 +1740,6 @@ var LINECHART = (function(){
 			if(sizeOfCircles[index] == null){
 				sizeOfCircles[index] = 2;
 			}
-			if(circlesC[index] == null){
-				circlesC[index] = "black";
-			}
 			if(pathOnOff[index] == null){
 				pathOnOff[index] = true;
 			}
@@ -1757,6 +1754,23 @@ var LINECHART = (function(){
 			}
 			if(slidePathVisibility[index] == null){
 				slidePathVisibility[index] = 75;
+			}
+			if(circlesC[index] == null){
+				if(index == 0){
+					circlesC[index] = 'url(#tempGradient)';
+				}
+				else if(index == 1){
+					circlesC[index] = 'url(#lightGradient)';
+				}
+				else if(index == 2){
+					circlesC[index] = 'url(#soundGradient)';
+				}
+				else if(index == 3){
+					circlesC[index] = 'Red';
+				}
+				else if(index == 4){
+					circlesC[index] = 'Blue';
+				}
 			}
 			if(pathColor[index] == null){
 				if(index == 0){
@@ -1785,7 +1799,7 @@ var LINECHART = (function(){
 			(function totalEverythingRepeat() {
 			//Stop everything when "stop" button is pressed
 			if (startStop == 0)
-			return;
+				return;
 			thisIsEverything = thisIsEverything.transition()
 
 			//Only allow processes to continue when data comes in

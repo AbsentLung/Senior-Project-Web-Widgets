@@ -129,15 +129,15 @@
 		LINECHART.options7("#theStatus", "#theClickedStatus", "#theSelectedOption");
 		/* The "defaults" commands define the line chart's attributes. */
 		//height, width, margin
-		LINECHART.defaults1(500, 1000, 75);
+		LINECHART.defaults1($(window).height()*3/4, $(window).width()*3/4, 75);
 		//X label, Y Label, Axis width, Axis Color, Ticks
 		LINECHART.defaults2("Time (Month/Day/Year Hour:Minute:Second)", "Data", 1, "black", 5);
 		//Domain, Values, Range Minimum [], Range Maximum [], End String []
-		LINECHART.defaults3(15, 1500, [0, 20, 40, 60, 80], [100, 40, 60, 80, 100], ["°C", "lm", "Hz", "bpm", "br/m"]);
+		LINECHART.defaults3(15, 1500, [17, 300, 25, 40, 10], [30, 500, 60, 100, 25], ["°C", "lux", "db", "bpm", "br/m"]);
 		//Path width, Path Color, Plot Circle Size, Plot Circle Color
 		LINECHART.defaults4(); //Left blank for defaults
 		//Plot On/Off, Paths On/Off, Sharp/Smooth, Fill On/Off, Estimated in-between Values On/Off, Select All
-		LINECHART.defaults5(false, true, false, false, true, false);
+		LINECHART.defaults5(false, true, false, false, false, false);
 		//Path Select Text []
 		LINECHART.defaults6(["Room Temperature", "Light", "Sound", "Heart Rate", "Respiratory Rate"]);
 		LINECHART.createLineChart();
